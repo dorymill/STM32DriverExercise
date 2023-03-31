@@ -71,6 +71,7 @@ typedef struct {
 /* CR1 Shorthand definitions */
 #define SPI_CPHA                 0
 #define SPI_CPOL                 1
+#define SPI_SSOE                 2
 #define SPI_MSTR                 2
 #define SPI_BR                   3
 #define SPI_SPE                  6
@@ -169,5 +170,7 @@ void SPI_IRQHandling       (SPI_Handle_t *pSPIHandle);
 /* Utility functions */
 uint8_t SPI_TXE_STATUS  (SPI_RegDef_t *pSPIx, uint32_t flag);
 void SPI_SSI_Config     (SPI_RegDef_t *pSPIx, uint32_t flag);
+void SPI_SSOE_Config    (SPI_RegDef_t *pSPIx, uint32_t flag);
+void SPI_SPE_Config     (SPI_RegDef_t *pSPIx, uint32_t flag);
 
 #endif /* STM32F446XX_SPI_H_ */

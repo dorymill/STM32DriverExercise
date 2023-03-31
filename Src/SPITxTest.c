@@ -59,7 +59,6 @@ int main(void)
 
     /* Configure GPIO Handle (SPI2 is on GPIOB) */
 
-
     /* Base configuration */
     hgpiob.GPIO_PinConfig.GPIO_PinAltFunc = 5;
     hgpiob.GPIO_PinConfig.GPIO_PinMode    = GPIO_MODE_ALTFUNC;
@@ -82,30 +81,37 @@ int main(void)
     /* NSS */
     hgpiob.GPIO_PinConfig.GPIO_PinNumber = 12;
     hgpiob.GPIO_PinConfig.GPIO_PinMode    = GPIO_MODE_OUT;
-    hgpiob.GPIO_PinConfig.GPIO_PinPUPDCtl = GPIO_PUPD_PU; /* If we bit bang via hardware */
+    hgpiob.GPIO_PinConfig.GPIO_PinPUPDCtl = GPIO_PUPD_NN;
     GPIO_Init(&hgpiob);
 
 
     /* Configure SPI Handle*/ 
+    /* Utilizing HW NSS option. See page 853-854 of reference manual. */
+    /* In this configuration, the NSS pin is driven contrary to the sate of SPE. */
     hspi2.SPI_Config.MSTR     = SPI_MSTR_MASTER;
     hspi2.SPI_Config.DFF      = SPI_DFF_8BIT;
     hspi2.SPI_Config.BIDIMODE = SPI_BIDIMODE_FD;
     hspi2.SPI_Config.SSM      = SPI_SSM_HW;
-    hspi2.SPI_Config.SSI      = SPI_SSM_HW;
-    hspi2.SPI_Config.SPE      = SPI_SPE_EN;
+    hspi2.SPI_Config.SPE      = SPI_SPE_DIS;
     
-    //SSOE Enable
-    hspi2.pSPIx->CR2 |= (ENABLE << 2);
-
     SPI_Init(&hspi2);
 
-    /* Send data! */
-    char * message = "In the sky there is nobody asleep. Nobody, nobody. Nobody is asleep. The creatures of the moon sniff and prowl about their cabins.";
+    SPI_SSOE_Config(hspi2.pSPIx, SET);
 
-    GPIO_WritePin(hgpiob.pGPIOx, 12, 0);
+    /* Send data! */
+    char * message = "In the sky there is nobody asleep. Nobody, nobody. \
+    Nobody is asleep. The creatures of the moon sniff and prowl about their cabins.";
+
+    /* Drive NSS Low */
+    SPI_SPE_Config(hspi2.pSPIx, ENABLE);
+
     SPI_Write(hspi2.pSPIx, (uint8_t *) message, (uint32_t) strlen(message));
+
+    /* Wait, then drive NSS High */
     delay(1);
-    GPIO_WritePin(hgpiob.pGPIOx, 12, 1);
+    SPI_SPE_Config(hspi2.pSPIx, DISABLE);
+
+
 
     while(1);
      

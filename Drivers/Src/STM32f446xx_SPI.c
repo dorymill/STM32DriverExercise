@@ -152,9 +152,6 @@ void SPI_Write  (SPI_RegDef_t *pSPIx, uint8_t *pTxBuffer, uint32_t length)
         /* Wait until TXE is set */
         while(!(pSPIx->SR & (1 << 1)));
 
-        /* Drive Slave Select low */
-        SPI_SSI_Config(pSPIx, RESET);
-
         /* Check DFF bit */
         if(pSPIx->CR1 & (1 << SPI_DFF))
         {
@@ -172,9 +169,6 @@ void SPI_Write  (SPI_RegDef_t *pSPIx, uint8_t *pTxBuffer, uint32_t length)
             pTxBuffer++;
 
         }
-
-        /* Drive SS high again. */
-        SPI_SSI_Config(pSPIx, SET);
 
     }
 
@@ -215,11 +209,33 @@ uint8_t SPI_TXE_STATUS  (SPI_RegDef_t *pSPIx, uint32_t flag)
 
 void SPI_SSI_Config     (SPI_RegDef_t *pSPIx, uint32_t flag)
 {
-    /* Configure SSI Bit for SW slave management */
+    /* Configure SSI Bit for NSS management */
 
     if(flag == SET) {
         pSPIx->CR1 |= (1 << SPI_SSI);
     } else {
         pSPIx->CR1 &= ~(1 << SPI_SSI);
+    }
+}
+
+void SPI_SSOE_Config     (SPI_RegDef_t *pSPIx, uint32_t flag)
+{
+    /* Configure SSOE Bit for NSS management */
+
+    if(flag == SET) {
+        pSPIx->CR2 |= (1 << SPI_SSOE);
+    } else {
+        pSPIx->CR2 &= ~(1 << SPI_SSOE);
+    }
+}
+
+void SPI_SPE_Config     (SPI_RegDef_t *pSPIx, uint32_t flag)
+{
+    /* Configure SPE Bit for NSS management */
+
+    if(flag == SET) {
+        pSPIx->CR1 |= (1 << SPI_SPE);
+    } else {
+        pSPIx->CR1 &= ~(1 << SPI_SPE);
     }
 }
