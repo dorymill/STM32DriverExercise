@@ -2,7 +2,7 @@
  * STM32f446xx_RCC.h
  *
  *  Created on: Jan 23, 2023
- *      Author: hackr6
+ *      Author: Asmod
  */
 #include "STM32f446xx.h"
 
@@ -12,6 +12,15 @@
 #include <stdint.h>
 
 #define __vo volatile
+
+/**
+ * @brief This files contains the macro for the pointer to 
+ *        the Reset and Clock Control (RCC) peripheral, 
+ *        its bus structure struct, and functional macros to
+ *        enable, disable, and reset the various peripherals
+ *        and their clocks.
+ * 
+ */
 
 /* RCC Register definition structure */
 typedef struct {

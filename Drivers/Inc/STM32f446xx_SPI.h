@@ -2,7 +2,7 @@
  * STM32f446xx_SPI.h
  *
  *  Created on: Jan 31, 2023
- *      Author: hackr6
+ *      Author: Asmod
  */
 
 #include "STM32f446xx.h"
@@ -18,8 +18,15 @@
 /* SPI API Header */
 /***************************************************************************/
 
+/**
+ * @brief This files contains the few basic structures for API implementation,
+ *        macros for the base addresses of the SPI peripherals, macros to define
+ *        the various configuration and mode settings, and lastly, the beloved 
+ *        function prototypes.
+ * 
+ */
 
-/* SPI Register definition structure */
+
 typedef struct {
 
     __vo uint32_t CR1;

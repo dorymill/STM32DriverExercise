@@ -2,7 +2,7 @@
  * STM32f446xx_GPIO.c
  *
  *  Created on: Jan 23, 2023
- *      Author: hackr6
+ *      Author: Asmod
  */
 
 #include "STM32f446xx_GPIO.h"
@@ -15,8 +15,18 @@
 /* GPIO API Function Implementations */
 /***************************************************************************/
 
+/**
+ * @brief Initialization functions
+ * 
+ */
 
-/* Peripheral clock setup */
+/**
+ * @brief Sets the state of the clock for the GPIO register passed
+ *        via @param pGPIOx based on @param state.
+ * 
+ * @param pGPIOx GPIO register pointer
+ * @param state  Enable or disable
+ */
 void GPIO_ClockCtl (GPIO_RegDef_t *pGPIOx, uint8_t state)
 {
     if(state == ENABLE){
@@ -57,7 +67,15 @@ void GPIO_ClockCtl (GPIO_RegDef_t *pGPIOx, uint8_t state)
 
 }
 
-/* Init/De-init */
+/**
+ * @brief Initialzies the GPIO device by writing parameters
+ *        found in the GPIO_PinConfig structure of the
+ *        @param pGPIOHandle to the GPIO configuration
+ *        registers.
+ * 
+ * @param pGPIOHandle Handle containing GPIO device and 
+ *                    configuration parameters
+ */
 void GPIO_Init   (GPIO_Handle_t *pGPIOHandle)
 {
 
@@ -131,14 +149,6 @@ void GPIO_Init   (GPIO_Handle_t *pGPIOHandle)
 
     /* Set alt func (opt) */
     if(pGPIOHandle->GPIO_PinConfig.GPIO_PinMode == GPIO_MODE_ALTFUNC) {
-        
-        // uint8_t temp1, temp2;
-
-        // temp1 = (uint8_t) pin / 7;
-        // temp2 = (uint8_t) pin % 7;
-
-        // pGPIOHandle->pGPIOx->AFR[temp1] &= (~0xF << ( 4 * temp2));
-        // pGPIOHandle->pGPIOx->AFR[temp1] |= ((pin & 7 ) << (4 * temp2));
 
         uint8_t afno = pGPIOHandle->GPIO_PinConfig.GPIO_PinAltFunc;
 
@@ -158,6 +168,11 @@ void GPIO_Init   (GPIO_Handle_t *pGPIOHandle)
 
 }
 
+/**
+ * @brief Resets the GPIO peripheral back to default state.
+ * 
+ * @param pGPIOx GPIO register pointer
+ */
 void GPIO_DeInit (GPIO_RegDef_t *pGPIOx)
 {
         if(pGPIOx == GPIOA){
@@ -177,17 +192,43 @@ void GPIO_DeInit (GPIO_RegDef_t *pGPIOx)
         }
 }
 
-/* I/O */
+/**
+ * @brief I/O Functions 
+ */
+
+/**
+ * @brief Reads and returns the state of the passed GPIO
+ *        @param pin on the passed @param pGPIOx bus.
+ * 
+ * @param pGPIOx    GPIO register pointer
+ * @param pin       GPIO pin number
+ * @return uint8_t  State of GPIO pin
+ */
 uint8_t GPIO_ReadPin   (GPIO_RegDef_t *pGPIOx, uint8_t pin)
 {
     return (uint8_t) ((pGPIOx->IDR >> pin) & 0x00000001);
 }
 
+/**
+ * @brief Reads and returns the entire internal data register
+ *        for the passed @param pGPIOx bus.
+ * 
+ * @param pGPIOx     GPIO register pointer
+ * @return uint16_t  Value of passed GPIO IDR
+ */
 uint16_t GPIO_ReadPort (GPIO_RegDef_t *pGPIOx)
 {
     return (uint16_t) (pGPIOx->IDR);
 }
 
+/**
+ * @brief Write @param val to @param pin on the passed 
+ *        @param pGPIOx register.
+ * 
+ * @param pGPIOx GPIO register pointer
+ * @param pin    GPIO pin to write to
+ * @param val    Value to write (Enable or Disable)
+ */
 void GPIO_WritePin     (GPIO_RegDef_t *pGPIOx, uint8_t pin, uint8_t val)
 {
     if (val == ENABLE) {
@@ -197,17 +238,42 @@ void GPIO_WritePin     (GPIO_RegDef_t *pGPIOx, uint8_t pin, uint8_t val)
     }
 }
 
+/**
+ * @brief Allows one to write to all of the pins on the passed
+ *        @param pGPIOx output data register at once based upon 
+ *        @param val.
+ * 
+ * @param pGPIOx GPIO register pointer
+ * @param val    Value to write to ODR
+ */
 void GPIO_WritePort    (GPIO_RegDef_t *pGPIOx, uint16_t val)
 {
     pGPIOx->ODR = val;
 }
 
+/**
+ * @brief Toggles the state of the passed @param pin on
+ *        the passed @param pGPIOx bus.
+ * 
+ * @param pGPIOx GPIO register pointer
+ * @param pin    GPIO pin
+ */
 void GPIO_TogglePin    (GPIO_RegDef_t *pGPIOx, uint8_t pin)
 {
     pGPIOx->ODR ^= (1 << pin);
 }
 
-/* Interrupt Handling */
+/**
+ * @brief Interrupt Functions 
+ */
+
+/**
+ * @brief Configures the appropriate NVIC set or clear registers
+ *        based on the passed @param IRQNumber and @param state.
+ * 
+ * @param IRQNumber Interrupt request number
+ * @param state     Enable or disable
+ */
 void GPIO_IRQConfig    (uint8_t IRQNumber, uint8_t state)
 {
     if(state == ENABLE) {
@@ -243,6 +309,13 @@ void GPIO_IRQConfig    (uint8_t IRQNumber, uint8_t state)
     }
 }
 
+/**
+ * @brief Sets the @param IRQPriority for the passed
+ *        @param IRQNumber.
+ * 
+ * @param IRQNumber    Interrupt request number
+ * @param IRQPriority  Interrupt priority
+ */
 void GPIO_IRQPriorityConfig (uint8_t IRQNumber, uint32_t IRQPriority)
 {
     /* Figure out register */
@@ -255,7 +328,13 @@ void GPIO_IRQPriorityConfig (uint8_t IRQNumber, uint32_t IRQPriority)
 
 }
 
-/* TO-DO: Fix this. */
+/**
+ * @brief Function that handles what happens when an
+ *        interrupt is thrown across a given @param pin.
+ *        
+ * 
+ * @param pin Interrupt pin
+ */
 void GPIO_IRQHandling  (uint8_t pin)
 {
 
@@ -269,6 +348,14 @@ void GPIO_IRQHandling  (uint8_t pin)
 
 }
 
+/**
+ * @brief Tight CPU loop for timing adjustments.
+ * 
+ * @param val Passing 1 to this parameter for this board 
+ *            results in about 300µs delay from the last clock
+ *            edge of a SPI transaction to the NSS high edge.
+ *             
+ */
 void delay(uint32_t val)
 {
 unsigned int j;

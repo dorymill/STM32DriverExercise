@@ -2,7 +2,7 @@
  * STM32f446xx.h
  *
  *  Created on: Jan 22, 2023
- *      Author: Doryan
+ *      Author: Asmod
  */
 
 #ifndef STM32F446XX_H_
@@ -11,6 +11,12 @@
 #include <stdint.h>
 
 #define __vo volatile
+
+/**
+ * @brief This files contains macros for pointers to the addresses of 
+ *        peripherals of the MCU unit, and NVIC register pointer macros.    
+ * 
+ */
 
 /* Processor Specific: ARM Cortex-M4 registers */
 /* Interrupt Set Registers */
@@ -33,18 +39,11 @@
 #define NVIC_ICER6               ((__vo uint32_t *) 0xE000E198U)
 #define NVIC_ICER7               ((__vo uint32_t *) 0xE000E19CU)
 
-/* Interrupt Priority Base Regiister */
+/* Interrupt Priority Base Register */
 #define NVIC_IPR                ((__vo uint32_t *) 0xE000E400U)
 
 /* Lower Order bits not implemented in this MCU */
 #define NVIC_IPR_BITS_IMP        4
-
-/* SPI IRQ Numbers */
-#define IRQ_NO_SPI1              35
-#define IRQ_NO_SPI2              36
-#define IRQ_NO_SPI3              51
-#define IRQ_NO_SPI4              84
-
 
 /* Base Addresses of Flash and SRAM memory */
 

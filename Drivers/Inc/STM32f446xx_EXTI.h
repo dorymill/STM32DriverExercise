@@ -2,7 +2,7 @@
  * STM32f446xx_EXTI.h
  *
  *  Created on: Jan 24, 2023
- *      Author: hackr6
+ *      Author: Asmod
  */
 
 
@@ -14,6 +14,13 @@
 #include <stdint.h>
 
 #define __vo volatile
+
+/**
+ * @brief This files contains a macro for the pointer to the external
+ *        interrupt bus, as well as the register structure for the bus
+ *        and basic state macros.
+ * 
+ */
 
 
 /* EXTI Register Structure */

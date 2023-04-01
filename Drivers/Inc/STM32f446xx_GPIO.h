@@ -2,7 +2,7 @@
  * STM32f446xx_GPIO.h
  *
  *  Created on: Jan 23, 2023
- *      Author: Doryan
+ *      Author: Asmod
  */
 
 #include "STM32f446xx.h"
@@ -18,6 +18,14 @@
 /***************************************************************************/
 /* GPIO API Header */
 /***************************************************************************/
+
+/**
+ * @brief This files contains the few basic structures for API implementation,
+ *        macros for the base addresses of the GPIO peripherals, macros to define
+ *        the various configuration and mode settings, and lastly, the beloved 
+ *        function prototypes.
+ * 
+ */
 
 /* GPIO Register definition structure */
 typedef struct {

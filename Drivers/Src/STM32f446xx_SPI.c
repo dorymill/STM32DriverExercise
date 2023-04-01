@@ -15,8 +15,18 @@
 /* SPI API Function Implementations */
 /***************************************************************************/
 
+/**
+ * @brief Initialization functions
+ * 
+ */
 
-/* Peripheral clock setup */
+/**
+ * @brief Enable and disables the clock for the provided SPI 
+ *        peripheral.
+ * 
+ * @param pSPIx SPI register pointer
+ * @param state Clock state
+ */
 void SPI_ClockCtl (SPI_RegDef_t *pSPIx, uint8_t state)
 {
     if(state == ENABLE){
@@ -47,7 +57,13 @@ void SPI_ClockCtl (SPI_RegDef_t *pSPIx, uint8_t state)
     }
 }
 
-/* Init/De-init */
+/**
+ * @brief Initialize the SPI peripheral associated with
+ *        the passed handle and configuration structure
+ *        therein.
+ * 
+ * @param pSPIHandle Handle for the SPI peripheral
+ */
 void SPI_Init   (SPI_Handle_t *pSPIHandle)
 {
 
@@ -117,6 +133,11 @@ void SPI_Init   (SPI_Handle_t *pSPIHandle)
 
 }
 
+/**
+ * @brief Deinitialize the SPI device.
+ * 
+ * @param pSPIx SPI register pointer
+ */
 void SPI_DeInit (SPI_RegDef_t *pSPIx)
 {
         if(pSPIx == SPI1){
@@ -130,16 +151,23 @@ void SPI_DeInit (SPI_RegDef_t *pSPIx)
         }
 }
 
-/* I/O  */
-/* Blocking I/O */
-/*
-    @brief: This method operates by taking in a pointer to the SPI 
-    peripheral, a pointer to a buffer of singular bytes--or a byte array,
-    and the length of the latter. It then sequentially waits until the
-    transmit buffer is empty, places 1 or 2 bytes in, decreases the number
-    of bytes required to be transferred, and increases the position of the
-    pointer to the transmit buffer data.
-*/
+
+/**
+ * @brief I/O Functions 
+ */
+
+/**
+ * @brief This method operates by taking in a pointer to the SPI 
+ *        peripheral, a pointer to a buffer of singular bytes--or a byte array,
+ *        and the length of the latter. It then sequentially waits until the
+ *        transmit buffer is empty, places 1 or 2 bytes in, decreases the number
+ *        of bytes required to be transferred, and increases the position of the
+ *        pointer to the transmit buffer data.
+ * 
+ * @param pSPIx     SPI register pointer
+ * @param pTxBuffer Pointer to user Tx data buffer
+ * @param length    Amount of data to send
+ */
 void SPI_Write  (SPI_RegDef_t *pSPIx, uint8_t *pTxBuffer, uint32_t length)
 {
 
@@ -174,6 +202,14 @@ void SPI_Write  (SPI_RegDef_t *pSPIx, uint8_t *pTxBuffer, uint32_t length)
 
 }
 
+/**
+ * @brief Performs the same fundamental operations as the write function
+ *        however, reads from the DR instead of writing to it.
+ * 
+ * @param pSPIx      SPI register pointer
+ * @param pRxBuffer  Pointer to user Rx data buffer
+ * @param length     Amount of data to receive
+ */
 void SPI_Read   (SPI_RegDef_t *pSPIx, uint8_t *pRxBuffer, uint32_t length)
 {
     if(length == 0){
@@ -206,7 +242,18 @@ void SPI_Read   (SPI_RegDef_t *pSPIx, uint8_t *pRxBuffer, uint32_t length)
     }
 }
 
-/* Non-Blocking I/O */
+/**
+ * @brief This method triggers a SPI write transaction via interrupt.
+ *        We check the state of the internal SPI handle, set the internal buffer 
+ *        pointer to the data to transmit along with the length parameter,
+ *        then trigger the interrupt via setting the TXEIE bit in the SPI
+ *        device config register referenced in @param pSPIHandle.
+ * 
+ * @param pSPIHandle Handle for the SPI peripheral
+ * @param pTxBuffer  Pointer to user Tx data buffer
+ * @param length     Amount of data to send
+ * @return uint8_t   Current state of internal SPI handle @param hTxState
+ */
 uint8_t SPI_Int_Write    (SPI_Handle_t *pSPIHandle, uint8_t *pTxBuffer, uint32_t length)
 {
 
@@ -231,6 +278,15 @@ uint8_t SPI_Int_Write    (SPI_Handle_t *pSPIHandle, uint8_t *pTxBuffer, uint32_t
     return state;
 }
 
+/**
+ * @brief Does the same as the interrupt write routine, utilizing the RXNEIE 
+ *        interrupt bit instead.
+ * 
+ * @param pSPIHandle Handle for the SPI peripheral
+ * @param pRxBuffer  Pointer to user Rx data buffer
+ * @param length     Amount of data to receive
+ * @return uint8_t   Current state of internal SPI handle @param hRxState
+ */
 uint8_t SPI_Int_Read     (SPI_Handle_t *pSPIHandle, uint8_t *pRxBuffer, uint32_t length)
 {
 
@@ -256,7 +312,17 @@ uint8_t SPI_Int_Read     (SPI_Handle_t *pSPIHandle, uint8_t *pRxBuffer, uint32_t
 
 }
 
-/* Interrupt Handling */
+
+/**
+ * @brief Interrupt handling functionality.
+ */
+
+/**
+ * @brief Sets the appropriate NVIC state from @param IRQNumber.
+ * 
+ * @param IRQNumber NVIC IRQ position
+ * @param state     IRQ state
+ */
 void SPI_IRQConfig    (uint8_t IRQNumber, uint8_t state)
 {
     if(state == ENABLE) {
@@ -292,6 +358,12 @@ void SPI_IRQConfig    (uint8_t IRQNumber, uint8_t state)
     }
 }
 
+/**
+ * @brief Sets the priority of the given @param IRQNumber.
+ * 
+ * @param IRQNumber   NVIC IRQ position
+ * @param IRQPriority Interrupt priority
+ */
 void SPI_IRQPriorityConfig (uint8_t IRQNumber, uint32_t IRQPriority)
 {
     /* Figure out register */
@@ -304,12 +376,29 @@ void SPI_IRQPriorityConfig (uint8_t IRQNumber, uint32_t IRQPriority)
 
 }
 
+/**
+ * @brief Interrupt service routine for SPI peripherals.
+ * 
+ * @param pSPIHandle Handle for the SPI peripheral
+ */
 void SPI_Isr        (SPI_Handle_t *pSPIHandle)
 {
 
 }
 
-/* Utility functions */
+
+/**
+ * @brief Utility functions to handle minor bit flips.
+ */
+
+/**
+ * @brief Acquires the @param pSPIx TXE bit state and compares it to
+ *        @param flag, returning 1 or 0 if they match or do not.
+ * 
+ * @param pSPIx    SPI register pointer
+ * @param flag     Flag to compare to
+ * @return uint8_t 1 for match, 0 if not
+ */
 uint8_t SPI_TXE_STATUS  (SPI_RegDef_t *pSPIx, uint32_t flag)
 {
     if((pSPIx->SR & 0x02U) & flag)
@@ -320,9 +409,14 @@ uint8_t SPI_TXE_STATUS  (SPI_RegDef_t *pSPIx, uint32_t flag)
     return RESET;
 }
 
+/**
+ * @brief Configures the @param pSPIx SSI bit.
+ * 
+ * @param pSPIx SPI register pointer
+ * @param flag  SSI state
+ */
 void SPI_SSI_Config     (SPI_RegDef_t *pSPIx, uint32_t flag)
 {
-    /* Configure SSI Bit for NSS management */
 
     if(flag == SET) {
         pSPIx->CR1 |= (1 << SPI_SSI);
@@ -331,9 +425,14 @@ void SPI_SSI_Config     (SPI_RegDef_t *pSPIx, uint32_t flag)
     }
 }
 
+/**
+ * @brief Configures the @param pSPIx SSOE bit.
+ * 
+ * @param pSPIx SPI register pointer
+ * @param flag  SSOE state
+ */
 void SPI_SSOE_Config    (SPI_RegDef_t *pSPIx, uint32_t flag)
 {
-    /* Configure SSOE Bit for NSS management */
 
     if(flag == SET) {
         pSPIx->CR2 |= (1 << SPI_SSOE);
@@ -342,9 +441,14 @@ void SPI_SSOE_Config    (SPI_RegDef_t *pSPIx, uint32_t flag)
     }
 }
 
+/**
+ * @brief Configures the @param pSPIx SPE bit, used for NSS.
+ * 
+ * @param pSPIx SPI register pointer
+ * @param flag  SPE state (0 for NSS high and 1 for NSS low in SSM HW mode)
+ */
 void SPI_SPE_Config     (SPI_RegDef_t *pSPIx, uint32_t flag)
 {
-    /* Configure SPE Bit for NSS management */
 
     if(flag == SET) {
         pSPIx->CR1 |= (1 << SPI_SPE);

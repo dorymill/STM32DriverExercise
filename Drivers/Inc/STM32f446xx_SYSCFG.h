@@ -2,7 +2,7 @@
  * STM32f446xx_SYSCFG.h
  *
  *  Created on: Jan 24, 2023
- *      Author: hackr6
+ *      Author: Asmod
  */
 
 #include "STM32f446xx.h"
@@ -13,6 +13,13 @@
 #include <stdint.h>
 
 #define __vo volatile
+
+/**
+ * @brief This files contains a macro pointing to the 
+ *        System Configuration register and a struct
+ *        for its bus.    
+ * 
+ */
 
 typedef struct {
 

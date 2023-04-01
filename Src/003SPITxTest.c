@@ -6,12 +6,6 @@
  */
 
 
-/*
-
-@brief: Testing SPI transmission!
-
-*/
-
 #include "STM32f446xx.h"
 #include "STM32f446xx_RCC.h"
 #include "STM32f446xx_SPI.h"
@@ -19,6 +13,11 @@
 #include <string.h>
 #include <unistd.h>
 
+
+/**
+ * @brief Testing SPI Tx transactions!
+ * 
+ */
 
 int main(void)
 {
