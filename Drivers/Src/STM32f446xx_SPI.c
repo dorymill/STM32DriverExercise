@@ -172,26 +172,139 @@ void SPI_Write  (SPI_RegDef_t *pSPIx, uint8_t *pTxBuffer, uint32_t length)
 
     }
 
-
 }
 
 void SPI_Read   (SPI_RegDef_t *pSPIx, uint8_t *pRxBuffer, uint32_t length)
 {
+    if(length == 0){
+        return;
+    }
+
+    while(length > 0)
+    {
+        /* Wait until RXNE is not set */
+        while(!(pSPIx->SR & (1 << 0)));
+
+        /* Check DFF bit */
+        if(pSPIx->CR1 & (1 << SPI_DFF))
+        {
+            /* 16 bit implementation */
+            *((volatile uint16_t *)&pRxBuffer) = *((uint16_t *) pSPIx->DR); /* Cast to uint16_t then dereference to get the data */
+            length--;
+            length--;
+            (uint16_t *) pRxBuffer++;
+
+        } else {
+        
+            /* 8 bit implementation */
+            *((volatile uint8_t *)&pRxBuffer) = pSPIx->DR;
+            length--;
+            pRxBuffer++;
+
+        }
+
+    }
+}
+
+/* Non-Blocking I/O */
+uint8_t SPI_Int_Write    (SPI_Handle_t *pSPIHandle, uint8_t *pTxBuffer, uint32_t length)
+{
+
+    uint8_t state = pSPIHandle->hTxState;
+
+    if(state != SPI_BUSY_RX) {
+
+        /* Save TxBuffer and length to handle variables. */
+        pSPIHandle->phTxBuffer = pTxBuffer;
+        pSPIHandle->hTxLen     = length;
+
+        /* Mark SPI state busy -> semaphore */
+        pSPIHandle->hTxState   = SPI_BUSY_TX;
+
+        /* Enable TXEIE control bit */
+        pSPIHandle->pSPIx->CR2 |= (1 << SPI_TXEIE);
+
+    }
+
+    /* Data Tx handled by ISR */
+
+    return state;
+}
+
+uint8_t SPI_Int_Read     (SPI_Handle_t *pSPIHandle, uint8_t *pRxBuffer, uint32_t length)
+{
+
+    uint8_t state = pSPIHandle->hRxState;
+
+    if(state != SPI_BUSY_TX) {
+
+        /* Save RxBuffer and length to handle variables. */
+        pSPIHandle->phRxBuffer = pRxBuffer;
+        pSPIHandle->hRxLen     = length;
+
+        /* Mark SPI state busy -> semaphore */
+        pSPIHandle->hRxState   = SPI_BUSY_RX;
+
+        /* Enable RXNEIE control bit */
+        pSPIHandle->pSPIx->CR2 |= (1 << SPI_RXNEIE);
+
+    }
+
+    /* Data Rx handled by ISR */
+
+    return state;
 
 }
 
-/* Interrput Handling */
-void SPI_IRQConfig         (uint8_t IRQNumber, uint8_t state)
+/* Interrupt Handling */
+void SPI_IRQConfig    (uint8_t IRQNumber, uint8_t state)
 {
+    if(state == ENABLE) {
 
+        if(IRQNumber <= 31) {
+
+            (*NVIC_ISER0) |= (1 << IRQNumber);
+
+        } else if (IRQNumber > 31 && IRQNumber < 64) {
+            
+            (*NVIC_ISER1) |= (1 << (IRQNumber % 32));
+
+        } else if (IRQNumber >= 64 && IRQNumber < 96) {
+
+            (*NVIC_ISER2) |= (1 << (IRQNumber % 64));
+        }
+
+    } else {
+
+        if(IRQNumber <= 31) {
+
+            (*NVIC_ICER0) &= ~(1 << IRQNumber);
+
+        } else if (IRQNumber > 31 && IRQNumber < 64) {
+
+            (*NVIC_ICER1) &= ~(1 << (IRQNumber % 32));
+
+        } else if (IRQNumber >= 64 && IRQNumber < 96) {
+
+            (*NVIC_ICER2) &= ~(1 << (IRQNumber % 64));
+
+        }
+    }
 }
 
 void SPI_IRQPriorityConfig (uint8_t IRQNumber, uint32_t IRQPriority)
 {
+    /* Figure out register */
+    uint8_t iprx         = IRQNumber / 4;
+    uint8_t iprx_section = IRQNumber % 4;
+    uint8_t shift_amnt   = (8 * iprx_section) + (8 - NVIC_IPR_BITS_IMP);
+
+    /* Write to it */
+    *(NVIC_IPR + iprx) |= (IRQPriority << (shift_amnt));
 
 }
 
-void SPI_IRQHandling       (SPI_Handle_t *pSPIHandle)
+void SPI_Isr        (SPI_Handle_t *pSPIHandle)
 {
 
 }
@@ -218,7 +331,7 @@ void SPI_SSI_Config     (SPI_RegDef_t *pSPIx, uint32_t flag)
     }
 }
 
-void SPI_SSOE_Config     (SPI_RegDef_t *pSPIx, uint32_t flag)
+void SPI_SSOE_Config    (SPI_RegDef_t *pSPIx, uint32_t flag)
 {
     /* Configure SSOE Bit for NSS management */
 

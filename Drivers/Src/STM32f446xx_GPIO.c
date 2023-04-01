@@ -255,6 +255,7 @@ void GPIO_IRQPriorityConfig (uint8_t IRQNumber, uint32_t IRQPriority)
 
 }
 
+/* TO-DO: Fix this. */
 void GPIO_IRQHandling  (uint8_t pin)
 {
 

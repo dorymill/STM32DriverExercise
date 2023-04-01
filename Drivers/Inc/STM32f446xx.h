@@ -39,6 +39,11 @@
 /* Lower Order bits not implemented in this MCU */
 #define NVIC_IPR_BITS_IMP        4
 
+/* SPI IRQ Numbers */
+#define IRQ_NO_SPI1              35
+#define IRQ_NO_SPI2              36
+#define IRQ_NO_SPI3              51
+#define IRQ_NO_SPI4              84
 
 
 /* Base Addresses of Flash and SRAM memory */

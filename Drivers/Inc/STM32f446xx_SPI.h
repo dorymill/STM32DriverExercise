@@ -60,6 +60,13 @@ typedef struct {
     SPI_RegDef_t  *pSPIx;
     SPI_Config_t   SPI_Config;
 
+    __vo uint8_t    *phTxBuffer;
+    __vo uint8_t    *phRxBuffer;
+    __vo uint32_t    hTxLen;
+    __vo uint32_t    hRxLen;
+    __vo uint8_t     hTxState;
+    __vo uint8_t     hRxState;
+
 } SPI_Handle_t;
 
 /* Explicit SPI peripheral definitions */
@@ -88,6 +95,9 @@ typedef struct {
 #define SPI_RXNE                 0
 #define SPI_TXE                  1
 #define SPI_BUSY                 7
+
+#define SPI_TXEIE                7
+#define SPI_RXNEIE               6
 
 #define SPI_TXE_FLAG             (1 << SPI_TXE)
 #define SPI_RXNE_FLAG            (1 << SPI_RXNE)
@@ -146,6 +156,10 @@ typedef struct {
 
 #define SET                      ENABLE
 
+#define SPI_READY                0
+#define SPI_BUSY_RX              1
+#define SPI_BUSY_TX              2
+
 /***************************************************************************/
 /* SPI API Function Prototypes */
 /***************************************************************************/
@@ -162,10 +176,14 @@ void SPI_DeInit (SPI_RegDef_t *pSPIx);
 void SPI_Write  (SPI_RegDef_t *pSPIx, uint8_t *pTxBuffer, uint32_t length);
 void SPI_Read   (SPI_RegDef_t *pSPIx, uint8_t *pRxBuffer, uint32_t length);
 
+/* Non-Blocking I/O */
+uint8_t SPI_Int_Write    (SPI_Handle_t *pSPIHandle, uint8_t *pTxBuffer, uint32_t length);
+uint8_t SPI_Int_Read     (SPI_Handle_t *pSPIHandle, uint8_t *pRxBuffer, uint32_t length);
+
 /* Interrput Handling */
 void SPI_IRQConfig         (uint8_t IRQNumber, uint8_t state);
 void SPI_IRQPriorityConfig (uint8_t IRQNumber, uint32_t IRQPriority);
-void SPI_IRQHandling       (SPI_Handle_t *pSPIHandle);
+void SPI_Isr               (SPI_Handle_t *pSPIHandle);
 
 /* Utility functions */
 uint8_t SPI_TXE_STATUS  (SPI_RegDef_t *pSPIx, uint32_t flag);
