@@ -98,8 +98,7 @@ int main(void)
     SPI_SSOE_Config(hspi2.pSPIx, SET);
 
     /* Send data! */
-    char * message = "In the sky there is nobody asleep. Nobody, nobody. \
-    Nobody is asleep. The creatures of the moon sniff and prowl about their cabins.";
+    char * message = "In the sky there is nobody asleep.";
 
     /* Drive NSS Low */
     SPI_SPE_Config(hspi2.pSPIx, ENABLE);

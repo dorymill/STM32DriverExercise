@@ -247,7 +247,7 @@ void SPI_Read   (SPI_RegDef_t *pSPIx, uint8_t *pRxBuffer, uint32_t length)
  *        We check the state of the internal SPI handle, set the internal buffer 
  *        pointer to the data to transmit along with the length parameter,
  *        then trigger the interrupt via setting the TXEIE bit in the SPI
- *        device config register referenced in @param pSPIHandle.
+ *        device config register referenced in pSPIHandle.
  * 
  * @param pSPIHandle Handle for the SPI peripheral
  * @param pTxBuffer  Pointer to user Tx data buffer
@@ -317,8 +317,13 @@ uint8_t SPI_Int_Read     (SPI_Handle_t *pSPIHandle, uint8_t *pRxBuffer, uint32_t
  * @brief Interrupt handling functionality.
  */
 
+/* Static function prototypes */
+static void SPI_TXE_ISR    (SPI_Handle_t *pSPIHandle);
+static void SPI_RXNE_ISR   (SPI_Handle_t *pSPIHandle);
+static void SPI_OVR_ISR    (SPI_Handle_t *pSPIHandle);
+
 /**
- * @brief Sets the appropriate NVIC state from @param IRQNumber.
+ * @brief Sets the appropriate NVIC state from IRQNumber.
  * 
  * @param IRQNumber NVIC IRQ position
  * @param state     IRQ state
@@ -359,7 +364,7 @@ void SPI_IRQConfig    (uint8_t IRQNumber, uint8_t state)
 }
 
 /**
- * @brief Sets the priority of the given @param IRQNumber.
+ * @brief Sets the priority of the given IRQNumber.
  * 
  * @param IRQNumber   NVIC IRQ position
  * @param IRQPriority Interrupt priority
@@ -381,19 +386,163 @@ void SPI_IRQPriorityConfig (uint8_t IRQNumber, uint32_t IRQPriority)
  * 
  * @param pSPIHandle Handle for the SPI peripheral
  */
-void SPI_Isr        (SPI_Handle_t *pSPIHandle)
+void SPI_ISR       (SPI_Handle_t *pSPIHandle)
 {
+    /* Since there are multiple types of interrupt, we must handle
+    them case by case */
+    uint8_t temp1, temp2;
+
+    /* Checking and handling of TXE */
+    temp1 = pSPIHandle->pSPIx->SR  & (1 << SPI_TXE);
+    temp2 = pSPIHandle->pSPIx->CR2 & (1 << SPI_TXEIE);
+
+    if (temp1 && temp2) {
+        SPI_TXE_ISR(pSPIHandle);
+    }
+
+    /* Checking and handling of RXNE */
+    temp1 = pSPIHandle->pSPIx->SR  & (1 << SPI_RXNE);
+    temp2 = pSPIHandle->pSPIx->CR2 & (1 << SPI_RXNEIE);
+
+    if (temp1 && temp2) {
+        SPI_RXNE_ISR(pSPIHandle);
+    }
+
+    /* CRC not implemented in this course, but straightforward to do. Same with MODF. 
+       we mainly care about read and write. Implement as an exercise.
+    */
+    // /* Checking and handling of CRC Error */
+    // temp1 = pSPIHandle->pSPIx->SR  & (1 << SPI_CRCERR);
+    // temp2 = pSPIHandle->pSPIx->CR2 & (1 << SPI_ERRIE);
+
+    // if (temp1 && temp2) {
+    //     SPI_CRCERR_ISR();
+    // }
+
+    /* Checking and handling of OVR */
+    temp1 = pSPIHandle->pSPIx->SR  & (1 << SPI_OVR);
+    temp2 = pSPIHandle->pSPIx->CR2 & (1 << SPI_ERRIE);
+
+    if (temp1 && temp2) {
+        SPI_OVR_ISR(pSPIHandle);
+    }
 
 }
 
+/**
+ * @brief Takes in the SPI Handle and executes the SPI_Read
+ *        operation using the data buffers and length fields
+ *        internal to the pSPIHandle structure, at the behest
+ *        of the processor interrupt and provides and application
+ *        callback method.
+ * 
+ * @param pSPIHandle Handle for the SPI peripheral
+ */
+static void SPI_TXE_ISR    (SPI_Handle_t *pSPIHandle)
+{
+
+        /* Check DFF bit */
+        if(pSPIHandle->pSPIx->CR1 & (1 << SPI_DFF))
+        {
+            /* 16 bit implementation */
+            /* Cast to uint16_t then dereference to get the data */
+            *((volatile uint16_t *)&pSPIHandle->pSPIx->DR) = *((uint16_t *) pSPIHandle->phTxBuffer); 
+            
+            pSPIHandle->hTxLen--;
+            pSPIHandle->hTxLen--;
+            
+            pSPIHandle->phTxBuffer++;
+            pSPIHandle->phTxBuffer++;
+
+        } else {
+        
+            /* 8 bit implementation */
+            *((volatile uint8_t *)&pSPIHandle->pSPIx->DR) = *pSPIHandle->phTxBuffer;
+            
+            pSPIHandle->hTxLen--;
+            
+            pSPIHandle->phTxBuffer++;
+
+        }
+
+        if(!pSPIHandle->hTxLen) {
+
+            SPI_Tx_Abort(pSPIHandle);
+            
+            SPI_ApplicationEventCallback(pSPIHandle, SPI_EVENT_TX_CMPLT);
+        }
+
+}
+
+/**
+ * @brief Takes in the SPI Handle and executes the SPI_Write
+ *        operation on interrupt.
+ * 
+ * @param pSPIHandle Handle for the SPI peripheral
+ */
+static void SPI_RXNE_ISR   (SPI_Handle_t *pSPIHandle)
+{
+        /* Check DFF bit */
+        if(pSPIHandle->pSPIx->CR1 & (1 << SPI_DFF))
+        {
+            /* 16 bit implementation */
+            *((volatile uint16_t *)&pSPIHandle->phRxBuffer) = *((uint16_t *) pSPIHandle->pSPIx->DR); /* Cast to uint16_t then dereference to get the data */
+            
+            pSPIHandle->hRxLen--;
+            pSPIHandle->hRxLen--;
+            
+            pSPIHandle->phRxBuffer++;
+            pSPIHandle->phRxBuffer++;
+
+        } else {
+        
+            /* 8 bit implementation */
+            *((volatile uint8_t *)&pSPIHandle->phRxBuffer) = pSPIHandle->pSPIx->DR;
+            
+            pSPIHandle->hRxLen--;
+            
+            pSPIHandle->phRxBuffer++;
+
+        }
+
+        if(!pSPIHandle->hRxLen) {
+
+            SPI_Rx_Abort(pSPIHandle);
+            
+            SPI_ApplicationEventCallback(pSPIHandle, SPI_EVENT_RX_CMPLT);
+        }
+}
+
+/**
+ * @brief Handles overrun fault by read to the SPI data and 
+ *        status registers respectively.
+ * 
+ * @param pSPIHandle Handle for the SPI peripheral
+ */
+static void SPI_OVR_ISR    (SPI_Handle_t *pSPIHandle)
+{
+
+    uint8_t temp;
+
+    /* Read from the DR followed by the SR. */
+    if(pSPIHandle->hTxState != SPI_BUSY_TX) {
+        temp = pSPIHandle->pSPIx->DR;
+        temp = pSPIHandle->pSPIx->SR;
+    }
+
+    (void) temp;
+    
+    /* Notify the application. */
+    SPI_ApplicationEventCallback(pSPIHandle, SPI_EVENT_OVR_CMPLT);
+}
 
 /**
  * @brief Utility functions to handle minor bit flips.
  */
 
 /**
- * @brief Acquires the @param pSPIx TXE bit state and compares it to
- *        @param flag, returning 1 or 0 if they match or do not.
+ * @brief Acquires the pSPIx TXE bit state and compares it to the
+ *        flag, returning 1 or 0 if they match or do not.
  * 
  * @param pSPIx    SPI register pointer
  * @param flag     Flag to compare to
@@ -410,7 +559,7 @@ uint8_t SPI_TXE_STATUS  (SPI_RegDef_t *pSPIx, uint32_t flag)
 }
 
 /**
- * @brief Configures the @param pSPIx SSI bit.
+ * @brief Configures the pSPIx SSI bit.
  * 
  * @param pSPIx SPI register pointer
  * @param flag  SSI state
@@ -426,7 +575,7 @@ void SPI_SSI_Config     (SPI_RegDef_t *pSPIx, uint32_t flag)
 }
 
 /**
- * @brief Configures the @param pSPIx SSOE bit.
+ * @brief Configures the pSPIx SSOE bit.
  * 
  * @param pSPIx SPI register pointer
  * @param flag  SSOE state
@@ -442,7 +591,7 @@ void SPI_SSOE_Config    (SPI_RegDef_t *pSPIx, uint32_t flag)
 }
 
 /**
- * @brief Configures the @param pSPIx SPE bit, used for NSS.
+ * @brief Configures the pSPIx SPE bit, used for NSS.
  * 
  * @param pSPIx SPI register pointer
  * @param flag  SPE state (0 for NSS high and 1 for NSS low in SSM HW mode)
@@ -455,4 +604,50 @@ void SPI_SPE_Config     (SPI_RegDef_t *pSPIx, uint32_t flag)
     } else {
         pSPIx->CR1 &= ~(1 << SPI_SPE);
     }
+}
+
+/**
+ * @brief Disengage SPI TXE interrupt and sets internal handle
+ *        Tx buffers and states to ready.
+ * 
+ * @param pSPIHandle Handle for the SPI peripheral
+ */
+void SPI_Tx_Abort       (SPI_Handle_t *pSPIHandle)
+{
+    /* Flip TXEIE control bit to disengage the interrupt. */
+    pSPIHandle->pSPIx->CR2 &= ~(1 << SPI_TXEIE);
+    
+    pSPIHandle->phTxBuffer = NULL;
+    pSPIHandle->hTxLen     = 0;
+    pSPIHandle->hTxState   = SPI_READY;
+
+}
+
+/**
+ * @brief Disengage SPI RXNE interrupt and sets internal
+ *        handle Rx buffers and states to ready.
+ * 
+ * @param pSPIHandle Handle for the SPI peripheral
+ */
+void SPI_Rx_Abort       (SPI_Handle_t *pSPIHandle)
+{
+    /* Flip RXNEIE control bit to disengage interrupt. */
+    pSPIHandle->pSPIx->CR2 &= ~(1 << SPI_RXNEIE);
+    
+    pSPIHandle->phRxBuffer = NULL;
+    pSPIHandle->hRxLen     = 0;
+    pSPIHandle->hRxState   = SPI_READY;
+
+}
+
+/**
+ * @brief Application callback to be overridden by application.
+ * 
+ * @param pSPIHandle Handle for the SPI peripheral
+ * @param event      Event type, BUSY, TX, RX, READY
+ * @return __weak 
+ */
+__weak void SPI_ApplicationEventCallback(SPI_Handle_t *pSPIHandle, uint8_t event)
+{
+    // To be implemented by the application.
 }

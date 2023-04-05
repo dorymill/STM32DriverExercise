@@ -10,9 +10,11 @@
 #ifndef STM32F446XX_SPI_H_
 #define STM32F446XX_SPI_H_
 
+#include <stddef.h>
 #include <stdint.h>
 
 #define __vo volatile
+#define __weak __attribute__((weak))
 
 /***************************************************************************/
 /* SPI API Header */
@@ -101,10 +103,15 @@ typedef struct {
 
 #define SPI_RXNE                 0
 #define SPI_TXE                  1
+#define SPI_CRCERR               4
+#define SPI_MODF                 5
+#define SPI_OVR                  6
 #define SPI_BUSY                 7
+#define SPI_FRE                  8
 
-#define SPI_TXEIE                7
+#define SPI_ERRIE                5
 #define SPI_RXNEIE               6
+#define SPI_TXEIE                7
 
 #define SPI_TXE_FLAG             (1 << SPI_TXE)
 #define SPI_RXNE_FLAG            (1 << SPI_RXNE)
@@ -156,6 +163,13 @@ typedef struct {
 #define SPI_CPHA_RISE            0
 #define SPI_CPHA_FALL            1
 
+/* Events */
+#define SPI_EVENT_TX_CMPLT       1
+#define SPI_EVENT_RX_CMPLT       2
+#define SPI_EVENT_OVR_CMPLT      3
+#define SPI_EVENT_CRC_CMPLT      4
+#define SPI_EVENT_MODF_CMPLT     5
+
 
 /* Generic macros */
 #define ENABLE                   1
@@ -190,12 +204,20 @@ uint8_t SPI_Int_Read     (SPI_Handle_t *pSPIHandle, uint8_t *pRxBuffer, uint32_t
 /* Interrput Handling */
 void SPI_IRQConfig         (uint8_t IRQNumber, uint8_t state);
 void SPI_IRQPriorityConfig (uint8_t IRQNumber, uint32_t IRQPriority);
-void SPI_Isr               (SPI_Handle_t *pSPIHandle);
+void SPI_ISR               (SPI_Handle_t *pSPIHandle);
+
+
 
 /* Utility functions */
 uint8_t SPI_TXE_STATUS  (SPI_RegDef_t *pSPIx, uint32_t flag);
 void SPI_SSI_Config     (SPI_RegDef_t *pSPIx, uint32_t flag);
 void SPI_SSOE_Config    (SPI_RegDef_t *pSPIx, uint32_t flag);
 void SPI_SPE_Config     (SPI_RegDef_t *pSPIx, uint32_t flag);
+
+void SPI_Tx_Abort       (SPI_Handle_t *pSPIHandle);
+void SPI_Rx_Abort       (SPI_Handle_t *pSPIHandle);
+
+/* Application callback interface */
+void SPI_ApplicationEventCallback(SPI_Handle_t *pSPIHandle, uint8_t event);
 
 #endif /* STM32F446XX_SPI_H_ */

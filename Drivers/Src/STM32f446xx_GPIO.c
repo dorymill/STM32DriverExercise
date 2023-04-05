@@ -22,7 +22,7 @@
 
 /**
  * @brief Sets the state of the clock for the GPIO register passed
- *        via @param pGPIOx based on @param state.
+ *        via pGPIOx based on state.
  * 
  * @param pGPIOx GPIO register pointer
  * @param state  Enable or disable
@@ -70,7 +70,7 @@ void GPIO_ClockCtl (GPIO_RegDef_t *pGPIOx, uint8_t state)
 /**
  * @brief Initialzies the GPIO device by writing parameters
  *        found in the GPIO_PinConfig structure of the
- *        @param pGPIOHandle to the GPIO configuration
+ *        pGPIOHandle to the GPIO configuration
  *        registers.
  * 
  * @param pGPIOHandle Handle containing GPIO device and 
@@ -198,7 +198,7 @@ void GPIO_DeInit (GPIO_RegDef_t *pGPIOx)
 
 /**
  * @brief Reads and returns the state of the passed GPIO
- *        @param pin on the passed @param pGPIOx bus.
+ *        pin on the passed pGPIOx bus.
  * 
  * @param pGPIOx    GPIO register pointer
  * @param pin       GPIO pin number
@@ -211,7 +211,7 @@ uint8_t GPIO_ReadPin   (GPIO_RegDef_t *pGPIOx, uint8_t pin)
 
 /**
  * @brief Reads and returns the entire internal data register
- *        for the passed @param pGPIOx bus.
+ *        for the passed pGPIOx bus.
  * 
  * @param pGPIOx     GPIO register pointer
  * @return uint16_t  Value of passed GPIO IDR
@@ -222,9 +222,8 @@ uint16_t GPIO_ReadPort (GPIO_RegDef_t *pGPIOx)
 }
 
 /**
- * @brief Write @param val to @param pin on the passed 
- *        @param pGPIOx register.
- * 
+ * @brief Write val to pin on the passed pGPIOx register.
+ *        
  * @param pGPIOx GPIO register pointer
  * @param pin    GPIO pin to write to
  * @param val    Value to write (Enable or Disable)
@@ -240,8 +239,8 @@ void GPIO_WritePin     (GPIO_RegDef_t *pGPIOx, uint8_t pin, uint8_t val)
 
 /**
  * @brief Allows one to write to all of the pins on the passed
- *        @param pGPIOx output data register at once based upon 
- *        @param val.
+ *        pGPIOx output data register at once based upon 
+ *        val.
  * 
  * @param pGPIOx GPIO register pointer
  * @param val    Value to write to ODR
@@ -252,8 +251,8 @@ void GPIO_WritePort    (GPIO_RegDef_t *pGPIOx, uint16_t val)
 }
 
 /**
- * @brief Toggles the state of the passed @param pin on
- *        the passed @param pGPIOx bus.
+ * @brief Toggles the state of the passed pin on
+ *        the passed pGPIOx bus.
  * 
  * @param pGPIOx GPIO register pointer
  * @param pin    GPIO pin
@@ -269,7 +268,7 @@ void GPIO_TogglePin    (GPIO_RegDef_t *pGPIOx, uint8_t pin)
 
 /**
  * @brief Configures the appropriate NVIC set or clear registers
- *        based on the passed @param IRQNumber and @param state.
+ *        based on the passed IRQNumber and state.
  * 
  * @param IRQNumber Interrupt request number
  * @param state     Enable or disable
@@ -310,8 +309,8 @@ void GPIO_IRQConfig    (uint8_t IRQNumber, uint8_t state)
 }
 
 /**
- * @brief Sets the @param IRQPriority for the passed
- *        @param IRQNumber.
+ * @brief Sets the IRQPriority for the passed
+ *        IRQNumber.
  * 
  * @param IRQNumber    Interrupt request number
  * @param IRQPriority  Interrupt priority
@@ -330,7 +329,7 @@ void GPIO_IRQPriorityConfig (uint8_t IRQNumber, uint32_t IRQPriority)
 
 /**
  * @brief Function that handles what happens when an
- *        interrupt is thrown across a given @param pin.
+ *        interrupt is thrown across a given pin.
  *        
  * 
  * @param pin Interrupt pin
