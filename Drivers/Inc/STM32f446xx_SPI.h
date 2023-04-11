@@ -192,7 +192,6 @@ void SPI_ClockCtl (SPI_RegDef_t *pSPIx, uint8_t state);
 void SPI_Init   (SPI_Handle_t *pSPIHandle);
 void SPI_DeInit (SPI_RegDef_t *pSPIx);
 
-/* I/O  */
 /* Blocking I/O */
 void SPI_Write  (SPI_RegDef_t *pSPIx, uint8_t *pTxBuffer, uint32_t length);
 void SPI_Read   (SPI_RegDef_t *pSPIx, uint8_t *pRxBuffer, uint32_t length);
@@ -205,8 +204,8 @@ uint8_t SPI_Int_Read     (SPI_Handle_t *pSPIHandle, uint8_t *pRxBuffer, uint32_t
 void SPI_IRQConfig         (uint8_t IRQNumber, uint8_t state);
 void SPI_IRQPriorityConfig (uint8_t IRQNumber, uint32_t IRQPriority);
 void SPI_ISR               (SPI_Handle_t *pSPIHandle);
-
-
+void SPI_Tx_Abort       (SPI_Handle_t *pSPIHandle);
+void SPI_Rx_Abort       (SPI_Handle_t *pSPIHandle);
 
 /* Utility functions */
 uint8_t SPI_TXE_STATUS  (SPI_RegDef_t *pSPIx, uint32_t flag);
@@ -214,8 +213,6 @@ void SPI_SSI_Config     (SPI_RegDef_t *pSPIx, uint32_t flag);
 void SPI_SSOE_Config    (SPI_RegDef_t *pSPIx, uint32_t flag);
 void SPI_SPE_Config     (SPI_RegDef_t *pSPIx, uint32_t flag);
 
-void SPI_Tx_Abort       (SPI_Handle_t *pSPIHandle);
-void SPI_Rx_Abort       (SPI_Handle_t *pSPIHandle);
 
 /* Application callback interface */
 void SPI_ApplicationEventCallback(SPI_Handle_t *pSPIHandle, uint8_t event);
