@@ -21,7 +21,7 @@
 /***************************************************************************/
 
 /**
- * @brief This files contains the few basic structures for API implementation,
+ * @brief This file contains the few basic structures for API implementation,
  *        macros for the base addresses of the SPI peripherals, macros to define
  *        the various configuration and mode settings, and lastly, the beloved 
  *        function prototypes.
