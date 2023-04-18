@@ -21,7 +21,7 @@
 /***************************************************************************/
 
 /**
- * @brief This files contains the few basic structures for API implementation,
+ * @brief This file contains the few basic structures for API implementation,
  *        macros for the base addresses of the I2C peripherals, macros to define
  *        the various configuration and mode settings, and lastly, the beloved 
  *        function prototypes.
@@ -47,12 +47,20 @@ typedef struct {
 /* I2C Configuration structure */
 typedef struct {
 
-    I2C_RegDef_t *i2Cx;
-    I2C_Config_t  I2C_Config;
+    uint8_t CLKSPD;
+    uint8_t ADDR;
+    uint8_t ACKCTL;
+    uint8_t FMDTYCYC;
 
 } I2C_Config_t;
 
 /* I2C Handle structure */
+typedef struct {
+
+    I2C_RegDef_t *pI2Cx;
+    I2C_Config_t  I2C_Config;
+
+} I2C_Handle_t;
 
 /* Explicit I2C peripheral definitions */
 #define I2C1                     ((I2C_RegDef_t *) I2C1_BASEADDR)
@@ -134,5 +142,24 @@ typedef struct {
 #define I2C_DNF                  0
 #define I2C_ANOFF                4
 
+
+/***************************************************************************/
+/* I2C API Function Prototypes */
+/***************************************************************************/
+
+/* Peripheral clock setup */
+void I2C_ClockCtl (I2C_RegDef_t *pI2Cx, uint8_t state);
+
+/* Init/De-init */
+void I2C_Init   (I2C_Handle_t *pI2CHandle);
+void I2C_DeInit (I2C_RegDef_t *pI2Cx);
+
+/* Master API */
+void I2C_MasterTx (void);
+void I2C_MasterRx (void);
+
+/* Slave API */
+void I2C_SlaveTx (void);
+void I2C_SlaveRx (void);
 
 #endif /* STM32F446XX_I2C_H_ */
