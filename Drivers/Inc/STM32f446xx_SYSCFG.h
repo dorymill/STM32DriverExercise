@@ -15,7 +15,7 @@
 #define __vo volatile
 
 /**
- * @brief This files contains a macro pointing to the 
+ * @brief This file contains a macro pointing to the 
  *        System Configuration register and a struct
  *        for its bus.    
  * 

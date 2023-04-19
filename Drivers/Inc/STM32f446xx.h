@@ -13,7 +13,7 @@
 #define __vo volatile
 
 /**
- * @brief This files contains macros for pointers to the addresses of 
+ * @brief This file contains macros for pointers to the addresses of 
  *        peripherals of the MCU unit, and NVIC register pointer macros.    
  * 
  */

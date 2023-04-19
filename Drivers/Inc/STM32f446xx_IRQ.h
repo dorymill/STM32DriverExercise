@@ -9,7 +9,7 @@
 #define STM32F446XX_IRQ_H_
 
 /**
- * @brief This files contains macros for interrupt request
+ * @brief This file contains macros for interrupt request
  *        numbers/positions.    
  * 
  */

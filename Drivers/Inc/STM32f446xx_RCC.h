@@ -14,7 +14,7 @@
 #define __vo volatile
 
 /**
- * @brief This files contains the macro for the pointer to 
+ * @brief This file contains the macro for the pointer to 
  *        the Reset and Clock Control (RCC) peripheral, 
  *        its bus structure struct, and functional macros to
  *        enable, disable, and reset the various peripherals
@@ -154,5 +154,10 @@ typedef struct {
 #define SPI2_RESET()            do{(RCC->APB1RSTR |= (1 << 14));  (RCC->APB1RSTR &= ~(1 << 14));} while(0)
 #define SPI3_RESET()            do{(RCC->APB1RSTR |= (1 << 15));  (RCC->APB1RSTR &= ~(1 << 15));} while(0)
 #define SPI4_RESET()            do{(RCC->APB2RSTR |= (1 << 13));  (RCC->APB2RSTR &= ~(1 << 13));} while(0)
+
+/* I2C Reset Macros */
+#define I2C1_RESET()            do{(RCC->APB1RSTR |= (1 << 21));  (RCC->APB1RSTR &= ~(1 << 21));} while(0)
+#define I2C2_RESET()            do{(RCC->APB1RSTR |= (1 << 22));  (RCC->APB1RSTR &= ~(1 << 22));} while(0)
+#define I2C3_RESET()            do{(RCC->APB1RSTR |= (1 << 23));  (RCC->APB1RSTR &= ~(1 << 23));} while(0)
 
 #endif /* STM32F446XX_RCC_H_ */

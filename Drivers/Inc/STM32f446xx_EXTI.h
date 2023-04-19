@@ -16,7 +16,7 @@
 #define __vo volatile
 
 /**
- * @brief This files contains a macro for the pointer to the external
+ * @brief This file contains a macro for the pointer to the external
  *        interrupt bus, as well as the register structure for the bus
  *        and basic state macros.
  * 
