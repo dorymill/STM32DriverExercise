@@ -324,7 +324,7 @@ void     I2C_ExecAddrPhase(I2C_RegDef_t *pI2Cx, uint8_t slaveAddr)
     slaveAddr = slaveAddr << 1;
 
     /* Write bit is 0 */
-    slaveAddr *= ~(1);
+    slaveAddr &= ~(1);
 
     /* Send it! */
     pI2Cx->DR = slaveAddr;
