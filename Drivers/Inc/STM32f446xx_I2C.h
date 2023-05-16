@@ -159,7 +159,8 @@ typedef struct {
 /***************************************************************************/
 
 /* Peripheral clock setup */
-void I2C_ClockCtl (I2C_RegDef_t *pI2Cx, uint8_t state);
+void     I2C_ClockCtl (I2C_RegDef_t *pI2Cx, uint8_t state);
+uint32_t I2C_PLLClockValue(void);
 
 /* Init/De-init */
 void I2C_Init   (I2C_Handle_t *pI2CHandle);

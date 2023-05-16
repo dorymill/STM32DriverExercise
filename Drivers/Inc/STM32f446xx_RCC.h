@@ -96,9 +96,9 @@ typedef struct {
 #define I2C2_CLOCK_EN()          (RCC->APB1ENR |= (1 << 22))
 #define I2C3_CLOCK_EN()          (RCC->APB1ENR |= (1 << 23))
 
-#define I2C1_CLOCK_DI ()         (RCC->APB1ENR &= ~(1 << 21))
-#define I2C2_CLOCK_DI ()         (RCC->APB1ENR &= ~(1 << 22))
-#define I2C3_CLOCK_DI ()         (RCC->APB1ENR &= ~(1 << 23))
+#define I2C1_CLOCK_DI()         (RCC->APB1ENR &= ~(1 << 21))
+#define I2C2_CLOCK_DI()         (RCC->APB1ENR &= ~(1 << 22))
+#define I2C3_CLOCK_DI()         (RCC->APB1ENR &= ~(1 << 23))
 
 /* Enable/Disable U(S)ART clocks */
 #define USART1_CLOCK_EN()        (RCC->APB2ENR |= (1 << 4) )
