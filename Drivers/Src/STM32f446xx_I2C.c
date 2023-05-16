@@ -32,7 +32,7 @@ uint8_t  APB_Prescaler[4] = {2,4,8,16};
  * @brief Enable and disable the clock for the provided I2C
  *        peripheral.
  * 
- * @param pI2Cx I2C register pointer
+ * @param pI2C I2C register pointer
  * @param state Clock state
  */
 void I2C_ClockCtl (I2C_RegDef_t *pI2Cx, uint8_t state)
@@ -59,6 +59,12 @@ void I2C_ClockCtl (I2C_RegDef_t *pI2Cx, uint8_t state)
     }
 }
 
+/**
+ * @brief Calculates the pll clock frequency required to
+ *        configure the I2C CCR.
+ * 
+ * @return uint32_t Clock frequency
+ */
 uint32_t I2C_PLLClockValue(void)
 {
     /* Using the RCC registers, we can calculate the 
@@ -123,11 +129,16 @@ uint32_t I2C_PLLClockValue(void)
     return result;
 }
 
+/**
+ * @brief Initializes the I2C peripheral.
+ * 
+ * @param pI2CHandle Handle for the I2C peripheral 
+ */
 void I2C_Init   (I2C_Handle_t *pI2CHandle)
 {
 
     /* Set configuration registers */
-    uint32_t temp = 0;
+    uint32_t temp  = 0;
 
     /* ACK Control */
     temp |= (pI2CHandle->I2C_Config.ACKCTL << 10);
@@ -174,10 +185,33 @@ void I2C_Init   (I2C_Handle_t *pI2CHandle)
     pI2CHandle->pI2Cx->CCR = temp;
 
     /* Set Rise-Time register */
-    /* To be implemented later. */
+    /* The resistance range of the pull-up resistors needed
+       can be calculated as
+       Rmin = (Vcc - Vol(max) )/ Iol 
+       Rmax = t_rise / (0.8473*Cb)  
+       Where, Vcc=power line voltage, Vol(max) is
+       line low voltage maximum output, Iol is low level
+       output current, t_rise is the rise time, and Cb is
+       the bus capacitve load. 
+       */
+    if(pI2CHandle->I2C_Config.CLKSPD <= I2C_SCLK_SM) /* Standard mode */
+    {
+        temp = I2C_PLLClockValue() / I2C_RISE_SMMAXHZ + 1;
+    } 
+    else /* Fast mode */
+    {
+        temp = ((I2C_PLLClockValue() * 300) / I2C_RISE_FMMAXHZ) + 1;
+    }
+
+    pI2CHandle->pI2Cx->TRISE = (temp & 0x3F);
 
 }
 
+/**
+ * @brief De-initializes the I2C peripheral.
+ * 
+ * @param pI2C I2C register pointer 
+ */
 void I2C_DeInit (I2C_RegDef_t *pI2Cx)
 {
         if(pI2Cx == I2C1){
@@ -187,4 +221,124 @@ void I2C_DeInit (I2C_RegDef_t *pI2Cx)
         } else if (pI2Cx == I2C3) {
             I2C3_RESET ();
         }
+}
+
+/**
+ * @brief Transmits data from device as master.
+ * 
+ * @param pI2CHandle Handle for the I2C peripheral
+ * @param pTxBuffer  Tx buffer
+ * @param len        Number of bytes to send
+ * @param slaveAddr  Address of slave device
+ */
+void I2C_MasterTx (I2C_Handle_t *pI2CHandle, 
+                        uint8_t *pTxBuffer, 
+                        uint32_t len, 
+                        uint8_t slaveAddr)
+{
+    /* Generate START condition */
+    I2C_GenerateStart(pI2CHandle->pI2Cx);
+
+    /* Confirm start by checking SB flag */
+    while(!I2C_GetFlagStatus(pI2CHandle->pI2Cx, I2C_FLAG_SB));
+
+    /* Send slave address */
+    I2C_ExecAddrPhase(pI2CHandle->pI2Cx, slaveAddr);
+
+    /* Confirm SR1 address field */
+    while(!I2C_GetFlagStatus(pI2CHandle->pI2Cx, I2C_FLAG_ADDR));
+
+    /* Clear addr flag according to SW sequence */
+    I2C_ClearAddrFlag(pI2CHandle->pI2Cx);
+
+    /* Send data until length is zero */
+    while(len > 0)
+    {
+        while(!I2C_GetFlagStatus(pI2CHandle->pI2Cx, I2C_FLAG_TXE));
+
+        pI2CHandle->pI2Cx->DR = *pTxBuffer;
+        pTxBuffer++;
+        len--;
+    }
+
+    /* Generate STOP condition */
+    I2C_GenerateStop(pI2CHandle->pI2Cx);
+
+}
+
+/**
+ * @brief Helper functions
+ * 
+ */
+
+/**
+ * @brief Generates start condition
+ * 
+ * @param pI2C I2C register pointer 
+ */
+void     I2C_GenerateStart(I2C_RegDef_t *pI2Cx)
+{
+    /* Generate start condition */
+    pI2Cx->CR1 |= (1 << I2C_CR1_START);
+
+}
+
+/**
+ * @brief Generates stop condition
+ * 
+ * @param pI2C I2C register pointer 
+ */
+void     I2C_GenerateStop(I2C_RegDef_t *pI2Cx)
+{
+    /* Generate start condition */
+    pI2Cx->CR1 |= (1 << I2C_CR1_STOP);
+
+}
+
+/**
+ * @brief Checks flag status and returns true if it's on.
+ * 
+ * @param pI2C I2C register pointer 
+ * @param flag Flag to check
+ * @return uint8_t 
+ */
+uint8_t  I2C_GetFlagStatus(I2C_RegDef_t *pI2Cx, uint32_t flag)
+{
+    if(pI2Cx->SR1 & flag)
+    {
+        return SET;
+    }
+
+    return RESET;
+}
+
+/**
+ * @brief Executes the address phase of I2C communication.
+ * 
+ * @param pI2C      I2C register pointer 
+ * @param slaveAddr Address of slave device
+ */
+void     I2C_ExecAddrPhase(I2C_RegDef_t *pI2Cx, uint8_t slaveAddr)
+{
+    /* Make space for the R/W bit! */
+    slaveAddr = slaveAddr << 1;
+
+    /* Write bit is 0 */
+    slaveAddr *= ~(1);
+
+    /* Send it! */
+    pI2Cx->DR = slaveAddr;
+}
+
+/**
+ * @brief Executes the clear address phase of I2C communication.
+ * 
+ * @param pI2C I2C register pointer 
+ */
+void     I2C_ClearAddrFlag(I2C_RegDef_t *pI2Cx)
+{
+    uint32_t dummy = pI2Cx->SR1;
+             dummy = pI2Cx->SR2;
+
+    (void) dummy;
 }
