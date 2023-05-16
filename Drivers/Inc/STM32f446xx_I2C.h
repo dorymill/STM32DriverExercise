@@ -195,11 +195,6 @@ void I2C_IRQPriorityConfig (uint8_t IRQNumber, uint32_t IRQPriority);
 uint32_t I2C_PLLClockValue(void);
 uint8_t  I2C_GetFlagStatus(I2C_RegDef_t *pI2Cx, uint32_t flag);
 
-static void     I2C_GenerateStart(I2C_RegDef_t *pI2Cx);
-static void     I2C_GenerateStop(I2C_RegDef_t *pI2Cx);
-static void     I2C_ExecAddrPhase(I2C_RegDef_t *pI2Cx, uint8_t slaveAddr);
-static void     I2C_ClearAddrFlag(I2C_RegDef_t *pI2Cx);
-
 
 /* Application callback interface */
 void I2C_ApplicationEventCallback(I2C_Handle_t *pI2CHandle, uint8_t event);
