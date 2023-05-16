@@ -22,6 +22,14 @@
 uint16_t AHB_Prescaler[8] = {2,4,8,16,64,128,256,512};
 uint8_t  APB_Prescaler[4] = {2,4,8,16};
 
+/**
+ * @brief Static function protoypes
+ * 
+ */
+static void     I2C_GenerateStart(I2C_RegDef_t *pI2Cx);
+static void     I2C_GenerateStop(I2C_RegDef_t *pI2Cx);
+static void     I2C_ExecAddrPhase(I2C_RegDef_t *pI2Cx, uint8_t slaveAddr);
+static void     I2C_ClearAddrFlag(I2C_RegDef_t *pI2Cx);
 
 /**
  * @brief Initialization functions

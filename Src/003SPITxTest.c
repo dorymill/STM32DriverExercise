@@ -19,7 +19,7 @@
  * 
  */
 
-int main(void)
+int main4(void)
 {
 
  /*
