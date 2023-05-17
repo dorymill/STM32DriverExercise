@@ -355,7 +355,7 @@ void I2C_MasterRx (I2C_Handle_t *pI2CHandle,
     }
 }
 
-
+ 
 
 /**
  * @brief Helper functions
