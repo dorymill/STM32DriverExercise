@@ -12,7 +12,7 @@
 #include <stdint.h>
 #include <string.h>
 
-#include <Inc/i2c.h>>
+#include <i2c.h>
 
 typedef struct {
 
