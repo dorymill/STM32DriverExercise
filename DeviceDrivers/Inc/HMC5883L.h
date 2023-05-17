@@ -121,8 +121,11 @@ typedef struct {
 #define COMPASS_SR_RDY                         0
 #define COMPASS_SR_LOCK                        1
 
-void InitCompass(I2C_Handle_t   *pI2CHandle,
-                CompassHandle_t *pCompass, 
-                CompassConfig_t  compassCfg);
+void InitCompass (I2C_Handle_t   *pI2CHandle,
+                 CompassHandle_t *pCompass, 
+                 CompassConfig_t  compassCfg);
+
+uint16_t GetBearing (I2C_Handle_t   *pI2CHandle,
+                     CompassHandle_t compass);
 
 #endif /* HMC5883L_H_ */

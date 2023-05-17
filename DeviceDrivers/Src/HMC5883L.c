@@ -58,3 +58,12 @@ void InitCompass(I2C_Handle_t   *pI2CHandle,
     I2C_MasterTx(pI2CHandle, cmd, 3, pCompass->devAddr);
 
 }
+
+uint16_t GetBearing (I2C_Handle_t   *pI2CHandle,
+                     CompassHandle_t compass)
+{
+       uint16_t bearing = 0;
+
+
+       return bearing;
+}
