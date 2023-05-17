@@ -7,7 +7,7 @@
 
 #include "HMC5883L.h"
 
-
+ 
 /*
   HMC5833L Compass API Implementation
 */
