@@ -5,10 +5,10 @@
  *      Author: Asmod
  */
 
-#include "STM32f446xx_I2C.h"
-#include "STM32f446xx_RCC.h"
-#include "STM32f446xx_EXTI.h"
-#include "STM32f446xx_SYSCFG.h"
+#include <exti.h>
+#include <i2c.h>
+#include <rcc.h>
+#include <syscfg.h>
 
 /***************************************************************************/
 /* I2C API Function Implementations */

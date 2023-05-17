@@ -6,10 +6,10 @@
  */
 
 
+#include <gpio.h>
+#include <rcc.h>
+#include <spi.h>
 #include "STM32f446xx.h"
-#include "STM32f446xx_RCC.h"
-#include "STM32f446xx_SPI.h"
-#include "STM32f446xx_GPIO.h"
 #include <string.h>
 #include <unistd.h>
 
