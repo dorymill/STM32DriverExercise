@@ -12,6 +12,8 @@
   HMC5833L Compass API Implementation
 */
 
+static void SingleShotRead(I2C_Handle_t *pI2CHandle, CompassHandle_t *pCompass);
+
 /**
  * @brief Initialize the compass by sequentially sending 
  *        a write byte, the register, and the value to write.
@@ -20,9 +22,9 @@
  * @param pCompass   Compass device handle
  * @param compassCfg Compass configuration structure 
  */
-void InitCompass(I2C_Handle_t   *pI2CHandle,
-                CompassHandle_t *pCompass, 
-                CompassConfig_t  compassCfg)
+void InitCompass(I2C_Handle_t    *pI2CHandle,
+                 CompassHandle_t *pCompass, 
+                 CompassConfig_t  compassCfg)
 {
 
     uint8_t temp = 0;
@@ -59,11 +61,38 @@ void InitCompass(I2C_Handle_t   *pI2CHandle,
 
 }
 
-uint16_t GetBearing (I2C_Handle_t   *pI2CHandle,
-                     CompassHandle_t compass)
+/**
+ * @brief Calibrate the compass.
+ * 
+ * @param pCompass Compass device handle
+ */
+void Calibrate (CompassHandle_t *pCompass);
+
+/**
+ * @brief Get compass bearing.
+ * 
+ * @param pI2CHandle Handle for the I2C peripheral
+ * @param compass    Compass device handle
+ * @return float     Bearing in degrees
+ */
+float GetBearing (I2C_Handle_t    *pI2CHandle,
+                  CompassHandle_t *pCompass)
 {
-       uint16_t bearing = 0;
+
+       SingleShotRead(pI2CHandle, pCompass);
+
+       return pCompass->compDat->bearing;
+}
 
 
-       return bearing;
+/**
+ * @brief Fill the compass device data buffer with
+ *        a single shot reading.
+ * 
+ * @param pI2CHandle Handle for the I2C peripheral
+ * @param pCompass   Compass device handle
+ */
+void SingleShotRead(I2C_Handle_t *pI2CHandle, CompassHandle_t *pCompass)
+{
+
 }

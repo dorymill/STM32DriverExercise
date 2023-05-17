@@ -20,7 +20,7 @@ typedef struct {
     int16_t y_msmnt;
     int16_t z_msmnt;
 
-    int16_t bearing;
+    float bearing;
 
 } CompassData_t;
 
@@ -125,7 +125,11 @@ void InitCompass (I2C_Handle_t   *pI2CHandle,
                  CompassHandle_t *pCompass, 
                  CompassConfig_t  compassCfg);
 
-uint16_t GetBearing (I2C_Handle_t   *pI2CHandle,
-                     CompassHandle_t compass);
+void Calibrate (CompassHandle_t *pCompass);
+
+float GetBearing (I2C_Handle_t   *pI2CHandle,
+                  CompassHandle_t *pCompass);
+
+
 
 #endif /* HMC5883L_H_ */
