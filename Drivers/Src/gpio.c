@@ -5,10 +5,10 @@
  *      Author: Asmod
  */
 
-#include "STM32f446xx_GPIO.h"
-#include "STM32f446xx_RCC.h"
-#include "STM32f446xx_EXTI.h"
-#include "STM32f446xx_SYSCFG.h"
+#include <exti.h>
+#include <gpio.h>
+#include <rcc.h>
+#include <syscfg.h>
 
 
 /***************************************************************************/

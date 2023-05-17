@@ -5,10 +5,10 @@
  *      Author: Asmod
  */
 
-#include "STM32f446xx_SPI.h"
-#include "STM32f446xx_RCC.h"
-#include "STM32f446xx_EXTI.h"
-#include "STM32f446xx_SYSCFG.h"
+#include <exti.h>
+#include <rcc.h>
+#include <spi.h>
+#include <syscfg.h>
 
 
 /***************************************************************************/

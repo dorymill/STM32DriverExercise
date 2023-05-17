@@ -5,8 +5,8 @@
  *      Author: Asmod
  */
 
-#ifndef STM32F446XX_IRQ_H_
-#define STM32F446XX_IRQ_H_
+#ifndef IRQ_H_
+#define IRQ_H_
 
 /**
  * @brief This file contains macros for interrupt request
@@ -29,4 +29,4 @@
 #define IRQ_NO_SPI3              51
 #define IRQ_NO_SPI4              84
 
-#endif /* STM32F446XX_IRQ_H_ */
+#endif /* IRQ_H_ */

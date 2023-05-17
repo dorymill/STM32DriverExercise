@@ -6,10 +6,10 @@
  */
 
 
+#include <gpio.h>
+#include <i2c.h>
+#include <rcc.h>
 #include "STM32f446xx.h"
-#include "STM32f446xx_RCC.h"
-#include "STM32f446xx_I2C.h"
-#include "STM32f446xx_GPIO.h"
 #include <string.h>
 #include <unistd.h>
 
