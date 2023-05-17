@@ -38,7 +38,7 @@ static void     I2C_ExecAddrPhase(I2C_RegDef_t *pI2Cx,
  * @brief Initialization functions
  * 
  */
-
+ 
 /**
  * @brief Enable and disable the clock for the provided I2C
  *        peripheral.
