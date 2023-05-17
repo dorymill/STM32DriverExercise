@@ -146,6 +146,10 @@ typedef struct {
 #define I2C_SCLK_SM              100000 /* 100 kHz */
 #define I2C_SCLK_FM              400000 /* 400 kHz */
 #define I2C_SCLK_FM200           200000 /* 200 kHz */
+#define TX                       0
+#define RX                       1
+#define ACK                      1
+#define NACK                     0
 
 #define I2C_ACKCTL_ENABLE        1
 #define I2C_ACKCTL_DISABLE       0 /* ACK is disabled by default!!! */
@@ -179,9 +183,12 @@ void I2C_DeInit (I2C_RegDef_t *pI2Cx);
 void I2C_MasterTx (I2C_Handle_t *pI2CHandle, 
                         uint8_t *pTxBuffer, 
                         uint32_t len, 
-                        uint8_t slaveAddr);
+                        uint8_t  slaveAddr);
 
-void I2C_MasterRx (void);
+void I2C_MasterRx (I2C_Handle_t *pI2CHandle, 
+                        uint8_t *pRxBuffer, 
+                        uint32_t len, 
+                        uint8_t  slaveAddr);
 
 /* Slave API */
 void I2C_SlaveTx (void);

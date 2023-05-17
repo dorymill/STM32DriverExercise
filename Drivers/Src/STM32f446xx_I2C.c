@@ -26,10 +26,13 @@ uint8_t  APB_Prescaler[4] = {2,4,8,16};
  * @brief Static function protoypes
  * 
  */
+static void     I2C_ACKControl   (I2C_RegDef_t *pI2Cx, uint8_t ACKNACK);
 static void     I2C_GenerateStart(I2C_RegDef_t *pI2Cx);
-static void     I2C_GenerateStop(I2C_RegDef_t *pI2Cx);
-static void     I2C_ExecAddrPhase(I2C_RegDef_t *pI2Cx, uint8_t slaveAddr);
+static void     I2C_GenerateStop (I2C_RegDef_t *pI2Cx);
 static void     I2C_ClearAddrFlag(I2C_RegDef_t *pI2Cx);
+static void     I2C_ExecAddrPhase(I2C_RegDef_t *pI2Cx, 
+                                        uint8_t slaveAddr, 
+                                        uint8_t RxTx);
 
 /**
  * @brief Initialization functions
@@ -251,7 +254,7 @@ void I2C_MasterTx (I2C_Handle_t *pI2CHandle,
     while(!I2C_GetFlagStatus(pI2CHandle->pI2Cx, I2C_FLAG_SB));
 
     /* Send slave address */
-    I2C_ExecAddrPhase(pI2CHandle->pI2Cx, slaveAddr);
+    I2C_ExecAddrPhase(pI2CHandle->pI2Cx, slaveAddr, TX);
 
     /* Confirm SR1 address field */
     while(!I2C_GetFlagStatus(pI2CHandle->pI2Cx, I2C_FLAG_ADDR));
@@ -273,6 +276,86 @@ void I2C_MasterTx (I2C_Handle_t *pI2CHandle,
     I2C_GenerateStop(pI2CHandle->pI2Cx);
 
 }
+
+
+void I2C_MasterRx (I2C_Handle_t *pI2CHandle, 
+                        uint8_t *pRxBuffer, 
+                        uint32_t len, 
+                        uint8_t  slaveAddr)
+{
+    /* Generate START condition */
+    I2C_GenerateStart(pI2CHandle->pI2Cx);
+
+    /* Confirm via checking SB flag */
+    while(!I2C_GetFlagStatus(pI2CHandle->pI2Cx, I2C_FLAG_SB));
+
+    /* Send slave address with R/W bit, read is 1 */
+    I2C_ExecAddrPhase(pI2CHandle->pI2Cx, slaveAddr, RX);
+
+    /* Wait for ADDR flag */
+    while(!I2C_GetFlagStatus(pI2CHandle->pI2Cx, I2C_FLAG_ADDR));
+
+    /* Single Byte Read */
+    if (len == 1) {
+
+        /* Disable ACK */
+        I2C_ACKControl(pI2CHandle->pI2Cx, NACK);
+
+        /* Generate STOP */
+        I2C_GenerateStop(pI2CHandle->pI2Cx);
+
+        /* Clear ADDR flag */
+        I2C_ClearAddrFlag(pI2CHandle->pI2Cx);
+
+        /* Wait for RXNE */
+        while(!I2C_GetFlagStatus(pI2CHandle->pI2Cx, I2C_FLAG_RXNE));
+
+        /* Read data */
+        pRxBuffer = (uint8_t *) pI2CHandle->pI2Cx->DR;
+
+    }
+
+    /* Multi byte read */
+    if (len > 1)
+    {
+        /* Clear ADDR flag */
+        I2C_ClearAddrFlag(pI2CHandle->pI2Cx);
+
+        /* Read! */
+        for(uint32_t iter = len; iter > 0; iter--)
+        {
+            /* Wait for RXNE to go active */
+            while(!I2C_GetFlagStatus(pI2CHandle->pI2Cx, I2C_FLAG_RXNE));
+
+            if(iter == 2)
+            {
+                /* Disable ACK */
+                I2C_ACKControl(pI2CHandle->pI2Cx, NACK);
+
+                /* Generate STOP */
+                I2C_GenerateStop(pI2CHandle->pI2Cx);
+            }
+
+            /* Read data */
+            pRxBuffer = (uint8_t *) pI2CHandle->pI2Cx->DR;
+            pRxBuffer++;
+            len--;
+
+        }
+    }
+
+    /* Re-enable ACK */
+    if(pI2CHandle->I2C_Config.ACKCTL == ACK)
+    {
+        I2C_ACKControl(pI2CHandle->pI2Cx, ACK);
+    }
+    else
+    {
+        I2C_ACKControl(pI2CHandle->pI2Cx, NACK);
+    }
+}
+
+
 
 /**
  * @brief Helper functions
@@ -325,14 +408,22 @@ uint8_t  I2C_GetFlagStatus(I2C_RegDef_t *pI2Cx, uint32_t flag)
  * 
  * @param pI2C      I2C register pointer 
  * @param slaveAddr Address of slave device
+ * @param RxTx      Receive or transmit flag
  */
-void     I2C_ExecAddrPhase(I2C_RegDef_t *pI2Cx, uint8_t slaveAddr)
+void     I2C_ExecAddrPhase(I2C_RegDef_t *pI2Cx, 
+                                 uint8_t slaveAddr, 
+                                 uint8_t RxTx)
 {
     /* Make space for the R/W bit! */
     slaveAddr = slaveAddr << 1;
 
     /* Write bit is 0 */
-    slaveAddr &= ~(1);
+    if(RxTx == TX)
+    {
+        slaveAddr &= ~(1);
+    } else {
+        slaveAddr |= 1;
+    }
 
     /* Send it! */
     pI2Cx->DR = slaveAddr;
@@ -349,4 +440,22 @@ void     I2C_ClearAddrFlag(I2C_RegDef_t *pI2Cx)
              dummy = pI2Cx->SR2;
 
     (void) dummy;
+}
+
+/**
+ * @brief 
+ * 
+ * @param pI2Cx 
+ * @param ACKNACK 
+ */
+void     I2C_ACKControl   (I2C_RegDef_t *pI2Cx, uint8_t ACKNACK)
+{
+    if(ACKNACK == ACK)
+    {
+        pI2Cx->CR1 |= (ACK << 10);
+    } 
+    else
+    {
+        pI2Cx->CR1 |= (NACK << 10);
+    }
 }
