@@ -133,9 +133,7 @@ void Calibrate (CompassHandle_t *pCompass);
 float GetBearing (I2C_Handle_t    *pI2CHandle,
                   CompassHandle_t *pCompass);
 
-uint8_t *commandGenTx (uint8_t address, uint8_t txDat);
-uint8_t *commandGenRx (uint8_t address);
-
-
+void commandGenTx (uint8_t address, uint8_t txDat, uint8_t *Txcmd);
+void commandGenRx (uint8_t address, uint8_t *Rxcmd);
 
 #endif /* HMC5883L_H_ */

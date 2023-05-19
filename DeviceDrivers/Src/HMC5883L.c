@@ -40,14 +40,14 @@ void InitCompass(I2C_Handle_t    *pI2CHandle,
            (compassCfg.output_rate  << COMPASS_CRA_DO0)  |
            (compassCfg.bias_control << COMPASS_CRA_MS0);
 
-    Txcmd = commandGenTx(COMPASS_CFGA, temp);
+    commandGenTx(COMPASS_CFGA, temp, Txcmd);
 
     I2C_MasterTx(pI2CHandle, &Txcmd, 3, pCompass->devAddr);
 
     /* Configure CRB */
     temp = (compassCfg.gain_control << COMPASS_CRB_GN);
 
-    Txcmd = commandGenTx(COMPASS_CFGB, temp);
+    commandGenTx(COMPASS_CFGB, temp, Txcmd);
 
     I2C_MasterTx(pI2CHandle, &Txcmd, 3, pCompass->devAddr);
 
@@ -55,7 +55,7 @@ void InitCompass(I2C_Handle_t    *pI2CHandle,
     temp = (compassCfg.op_mode << COMPASS_MODE_MDO) |
            (compassCfg.hsbit   << COMPASS_MODEHS);
 
-	Txcmd = commandGenTx(COMPASS_MODE, temp);
+	commandGenTx(COMPASS_MODE, temp, Txcmd);
 
     I2C_MasterTx(pI2CHandle, &Txcmd, 3, pCompass->devAddr);
 
@@ -118,7 +118,7 @@ void SingleShotRead(I2C_Handle_t *pI2CHandle, CompassHandle_t *pCompass)
 
 	/* Check status register for data ready flag. */
 	while(dataflag) { 
-		Rxcmd = commandGenRx(COMPASS_SR_RDY);
+		commandGenRx(COMPASS_SR_RDY, Rxcmd);
 
 		I2C_MasterTx(pI2CHandle,  Rxcmd,    2, COMPASS_ADDR);
 		I2C_MasterRx(pI2CHandle, &dataflag, 1, COMPASS_ADDR);
@@ -126,7 +126,7 @@ void SingleShotRead(I2C_Handle_t *pI2CHandle, CompassHandle_t *pCompass)
 
 	/* Read in axis data values */
 	for (int iter = 0; iter < 6; iter++) {
-		Rxcmd = commandGenRx(COMPASS_DR+iter);
+		commandGenRx(COMPASS_DR+iter, Rxcmd);
 		
 		I2C_MasterTx(pI2CHandle,  Rxcmd,         2, COMPASS_ADDR);
 		I2C_MasterRx(pI2CHandle, *(data + iter), 1, COMPASS_ADDR);
@@ -153,14 +153,11 @@ void SingleShotRead(I2C_Handle_t *pI2CHandle, CompassHandle_t *pCompass)
  * @param address   Compass register address
  * @return uint8_t* Pointer to crafted command array
  */
-uint8_t *commandGenRx (uint8_t address) {
+void commandGenRx (uint8_t address, uint8_t *Rxcmd) {
 
-	uint8_t command [2];
+	*(Rxcmd + 0) = COMPASS_REG_READ;
+	*(Rxcmd + 1) = address;
 
-	*(command + 0) = COMPASS_REG_READ;
-	*(command + 1) = address;
-
-	return &command;
 }
 
 
@@ -173,13 +170,10 @@ uint8_t *commandGenRx (uint8_t address) {
  * @param txDat     Data byte to write
  * @return uint8_t* Pointer to crafted command array
  */
-uint8_t *commandGenTx (uint8_t address, uint8_t txDat) {
+void commandGenTx (uint8_t address, uint8_t txDat, uint8_t *Txcmd) {
 
-	uint8_t command [3];
+	*(Txcmd + 0) = COMPASS_REG_WRITE;
+	*(Txcmd + 1) = address;
+	*(Txcmd + 2) = txDat;
 
-	*(command + 0) = COMPASS_REG_WRITE;
-	*(command + 1) = address;
-	*(command + 2) = txDat;
-
-	return &command;
 }
