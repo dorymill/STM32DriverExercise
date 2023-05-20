@@ -32,7 +32,7 @@ void InitCompass(I2C_Handle_t    *pI2CHandle,
 
     uint8_t temp = 0;
     uint8_t Txcmd [3];
-	uint8_t *pTxcmd = &Txcmd;
+	uint8_t *pTxcmd = &Txcmd[0];
 
     pCompass->devAddr = COMPASS_ADDR;
 
@@ -112,10 +112,10 @@ void SingleShotRead(I2C_Handle_t *pI2CHandle, CompassHandle_t *pCompass)
 {
 
 	uint8_t data[6];
-	uint8_t *pData = &data;
+	uint8_t *pData = &data[0];
 
 	uint8_t Rxcmd[2];
-	uint8_t *pRxcmd = &Rxcmd;
+	uint8_t *pRxcmd = &Rxcmd[0];
 
 	uint8_t temp = 0;
 
@@ -137,7 +137,7 @@ void SingleShotRead(I2C_Handle_t *pI2CHandle, CompassHandle_t *pCompass)
 		commandGenRx(COMPASS_DR+iter, pRxcmd);
 		
 		I2C_MasterTx(pI2CHandle,  pRxcmd,         2, COMPASS_ADDR);
-		I2C_MasterRx(pI2CHandle, *(pData + iter), 1, COMPASS_ADDR);
+		I2C_MasterRx(pI2CHandle, (pData + iter), 1, COMPASS_ADDR);
 
 	}
 	  
