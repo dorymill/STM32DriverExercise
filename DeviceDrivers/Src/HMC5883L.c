@@ -146,11 +146,11 @@ void SingleShotRead(I2C_Handle_t *pI2CHandle, CompassHandle_t *pCompass)
 										   ((*(pData + 1) & 0x00FF) << 0);
 
 	/* Store Y data */
-	pCompass->compDat->x_msmnt = (int16_t) ((*(pData + 4) & 0xFF00) << 8) |
+	pCompass->compDat->y_msmnt = (int16_t) ((*(pData + 4) & 0xFF00) << 8) |
 										   ((*(pData + 5) & 0x00FF) << 0);
 
 	/* Store Z data */
-	pCompass->compDat->x_msmnt = (int16_t) ((*(pData + 2) & 0xFF00) << 8) |
+	pCompass->compDat->z_msmnt = (int16_t) ((*(pData + 2) & 0xFF00) << 8) |
 										   ((*(pData + 3) & 0x00FF) << 0);
 }
 
