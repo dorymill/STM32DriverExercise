@@ -151,9 +151,12 @@ void I2C_Init   (I2C_Handle_t *pI2CHandle)
     /* Set configuration registers */
     uint32_t temp  = 0;
 
+    /* Enable peripheral */
+    pI2CHandle->pI2Cx->CR1 = (1 << 0);
+
     /* ACK Control */
     temp |= (pI2CHandle->I2C_Config.ACKCTL << 10);
-    pI2CHandle->pI2Cx->CR1 = temp;
+    pI2CHandle->pI2Cx->CR1 |= temp;
 
     /* Set FREQ */
     temp = 0;

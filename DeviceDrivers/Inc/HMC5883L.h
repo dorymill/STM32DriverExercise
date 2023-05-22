@@ -26,13 +26,6 @@ typedef struct {
 
 typedef struct {
 
-    uint8_t          devAddr;
-    CompassData_t   *compDat;
-
-} CompassHandle_t;
-
-typedef struct {
-
     uint8_t averaging;
     uint8_t output_rate;
     uint8_t bias_control;
@@ -43,6 +36,15 @@ typedef struct {
     uint8_t hsbit;
 
 } CompassConfig_t;
+
+typedef struct {
+
+    uint8_t          devAddr;
+    CompassData_t   *compDat;
+    CompassConfig_t  compConfig;
+
+} CompassHandle_t;
+
 
 /* Device address */
 #define COMPASS_ADDR                           0x1E
