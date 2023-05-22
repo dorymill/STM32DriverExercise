@@ -54,19 +54,19 @@ typedef struct {
 #define COMPASS_REG_WRITE                                  0x3C
 
 /* Register base addresses */
-#define COMPASS_CFGA                                       0
-#define COMPASS_CFGB                                       1
-#define COMPASS_MODE                                       2
-#define COMPASS_XMSB                                       3
-#define COMPASS_XLSB                                       4
+#define COMPASS_XLSB                                       0
+#define COMPASS_XMSB                                       1
+#define COMPASS_YLSB                                       2
+#define COMPASS_YMSB                                       3
+#define COMPASS_ZLSB                                       4
 #define COMPASS_ZMSB                                       5
-#define COMPASS_ZLSB                                       6
-#define COMPASS_YMSB                                       7
-#define COMPASS_YLSB                                       8
-#define COMPASS_SR                                         9
-#define COMPASS_IDA                                       10
-#define COMPASS_IDB                                       11
-#define COMPASS_IDC                                       12
+#define COMPASS_SR                                         6
+#define COMPASS_TR1                                        7
+#define COMPASS_TR2                                        8
+#define COMPASS_CR1                                        9
+#define COMPASS_CR2                                       10
+#define COMPASS_SRST                                      11
+#define COMPASS_CHID                                      12
 
 /* Configuration Register A definitions */
 #define COMPASS_CRA_MS0                                    0
