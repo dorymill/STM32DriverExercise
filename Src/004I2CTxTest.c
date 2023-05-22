@@ -6,11 +6,11 @@
  */
 
 
+#include <QMC5883L.h>
 #include "gpio.h"
 #include "i2c.h"
 #include "rcc.h"
 #include "STM32f446xx.h"
-#include "HMC5883L.h"
 #include <string.h>
 #include <unistd.h>
 
@@ -40,17 +40,6 @@ int main(void)
     hi2c2.pI2Cx = I2C2;
 
     CompassHandle_t hcompass;
-
-    /* 
-        Divide the clocks of APB1 and AHB1 to 
-        get their clock speeds to < 12 MHz
-        for a 24 MHz Logic Analyzer.
-    */
-   /* APB1 */
-    // RCC->CFGR |= (0b110 << 10);
-
-    // /* AHB1 */
-    // RCC->CFGR |= (0b1010 << 4);
 
     GPIO_ClockCtl(hgpiob.pGPIOx, ENABLE);
     I2C_ClockCtl(hi2c2.pI2Cx, ENABLE);

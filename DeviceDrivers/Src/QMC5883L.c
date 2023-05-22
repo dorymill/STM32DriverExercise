@@ -5,8 +5,8 @@
  *      Author: Asmod
  */
 
-#include "HMC5883L.h"
 #include <math.h>
+#include <QMC5883L.h>
 
 #define PI 3.1415926
 

@@ -5,8 +5,8 @@
  *      Author: Asmod
  */
 
-#ifndef HMC5883L_H_
-#define HMC5883L_H_
+#ifndef QMC5883L_H_
+#define QMC5883L_H_
 
 #include <stddef.h>
 #include <stdint.h>
@@ -47,7 +47,7 @@ typedef struct {
 
 
 /* Device address */
-#define COMPASS_ADDR                                       0x1E
+#define COMPASS_ADDR                                       0x0D
 
 /* Read/write command bytes */
 #define COMPASS_REG_READ                                   0x3D
@@ -138,4 +138,4 @@ float GetBearing (I2C_Handle_t    *pI2CHandle,
 void commandGenTx (uint8_t address, uint8_t txDat, uint8_t *Txcmd);
 void commandGenRx (uint8_t address, uint8_t *Rxcmd);
 
-#endif /* HMC5883L_H_ */
+#endif /* QMC5883L_H_ */
