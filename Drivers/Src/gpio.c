@@ -140,12 +140,11 @@ void GPIO_Init   (GPIO_Handle_t *pGPIOHandle)
     temp = 0;
 
     /* Configure optype */
-    if(pGPIOHandle->GPIO_PinConfig.GPIO_PinMode == GPIO_MODE_OUT){
-        temp = (pGPIOHandle->GPIO_PinConfig.GPIO_PinOPType << (1 * pin));
-        pGPIOHandle->pGPIOx->OTYPER &= (~0x1U << pin);
-        pGPIOHandle->pGPIOx->OTYPER |= temp;
-        temp = 0;
-    }
+    temp = (pGPIOHandle->GPIO_PinConfig.GPIO_PinOPType << (1 * pin));
+    pGPIOHandle->pGPIOx->OTYPER &= (~0x1U << pin);
+    pGPIOHandle->pGPIOx->OTYPER |= temp;
+    temp = 0;
+    
 
     /* Set alt func (opt) */
     if(pGPIOHandle->GPIO_PinConfig.GPIO_PinMode == GPIO_MODE_ALTFUNC) {

@@ -162,6 +162,7 @@ typedef struct {
 #define I2C_FLAG_RXNE             (1 << I2C_SR1_RXNE)
 #define I2C_FLAG_SB               (1 << I2C_SR1_SB)
 #define I2C_FLAG_ADDR             (1 << I2C_SR1_ADDR)
+#define I2C_FLAG_NACK             (1 << I2C_SR1_AF)
 
 /* I2C Max Rise Times */
 #define I2C_RISE_FMMAXHZ           1000000000U /* Base in Hz. The 300 comes in multiplication */

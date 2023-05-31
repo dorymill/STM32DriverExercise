@@ -111,7 +111,7 @@ uint32_t I2C_PLLClockValue(void)
     }
 
     /* Determine AHB Clock Prescaler */
-    temp = (RCC->CFGR >> 4) & 0x0F;
+    temp = ((RCC->CFGR >> 4) & 0x0F);
 
     if (temp < 8)
     {
@@ -123,7 +123,7 @@ uint32_t I2C_PLLClockValue(void)
     }
 
     /* Determine APB1 Clock Prescaler */
-    temp = (RCC->CFGR >> 10) & 0x07;
+    temp = ((RCC->CFGR >> 10) & 0x07);
 
     if(temp < 4)
     {
@@ -150,13 +150,6 @@ void I2C_Init   (I2C_Handle_t *pI2CHandle)
 
     /* Set configuration registers */
     uint32_t temp  = 0;
-
-    /* Enable peripheral */ 
-    pI2CHandle->pI2Cx->CR1 = (1 << 0);
-
-    /* ACK Control */
-    temp |= (pI2CHandle->I2C_Config.ACKCTL << 10);
-    pI2CHandle->pI2Cx->CR1 |= temp;
 
     /* Set FREQ */
     temp = 0;
@@ -210,14 +203,17 @@ void I2C_Init   (I2C_Handle_t *pI2CHandle)
        */
     if(pI2CHandle->I2C_Config.CLKSPD <= I2C_SCLK_SM) /* Standard mode */
     {
-        temp = I2C_PLLClockValue() / I2C_RISE_SMMAXHZ + 1;
+        temp = (I2C_PLLClockValue() / I2C_RISE_SMMAXHZ) + 1;
     } 
     else /* Fast mode */
     {
         temp = ((I2C_PLLClockValue() * 300) / I2C_RISE_FMMAXHZ) + 1;
     }
 
-    pI2CHandle->pI2Cx->TRISE = (temp & 0x3F);
+    pI2CHandle->pI2Cx->TRISE = temp & 0x3F;
+
+    /* Enable peripheral */ 
+    pI2CHandle->pI2Cx->CR1 = (1 << 0);
 
 }
 
@@ -250,6 +246,10 @@ void I2C_MasterTx (I2C_Handle_t *pI2CHandle,
                         uint32_t len, 
                         uint8_t slaveAddr)
 {
+
+    /* Retry counter */
+    uint8_t retry = 0;
+
     /* Generate START condition */
     I2C_GenerateStart(pI2CHandle->pI2Cx);
 
@@ -260,7 +260,29 @@ void I2C_MasterTx (I2C_Handle_t *pI2CHandle,
     I2C_ExecAddrPhase(pI2CHandle->pI2Cx, slaveAddr, TX);
 
     /* Confirm SR1 address field */
-    while(!I2C_GetFlagStatus(pI2CHandle->pI2Cx, I2C_FLAG_ADDR));
+    while(!I2C_GetFlagStatus(pI2CHandle->pI2Cx, I2C_FLAG_ADDR)) {
+        
+        // if(retry > 5) {
+        //     pI2CHandle->pI2Cx->CR1 |= (1 << 0);
+        //     pI2CHandle->pI2Cx->CR1 |= (0 << 0);
+
+        //     return;
+        // }
+
+        // pI2CHandle->pI2Cx->CR1 |= (1 << 0);
+        // pI2CHandle->pI2Cx->CR1 |= (0 << 0);
+
+        // I2C_GenerateStart(pI2CHandle->pI2Cx);
+
+        // while(!I2C_GetFlagStatus(pI2CHandle->pI2Cx, I2C_FLAG_SB));
+
+        // I2C_ExecAddrPhase(pI2CHandle->pI2Cx, slaveAddr, TX);
+
+        // for(int iter = 0; iter < 2000; iter++);
+
+        // retry++;
+
+    }
 
     /* Clear addr flag according to SW sequence */
     I2C_ClearAddrFlag(pI2CHandle->pI2Cx);
