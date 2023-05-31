@@ -31,7 +31,7 @@ void InitCompass(I2C_Handle_t    *pI2CHandle,
 {
 
     uint8_t temp = 0;
-    uint8_t Txcmd [3];
+    uint8_t Txcmd [2];
 	uint8_t *pTxcmd = &Txcmd[0];
 
     pCompass->devAddr = COMPASS_ADDR;
@@ -41,24 +41,24 @@ void InitCompass(I2C_Handle_t    *pI2CHandle,
            (compassCfg.output_rate  << COMPASS_CRA_DO0)  |
            (compassCfg.bias_control << COMPASS_CRA_MS0);
 
-    commandGenTx(COMPASS_CFGA, temp, pTxcmd);
+    commandGenTx(COMPASS_CR1, temp, pTxcmd);
 
-    I2C_MasterTx(pI2CHandle, pTxcmd, 3, pCompass->devAddr);
+    I2C_MasterTx(pI2CHandle, pTxcmd, 2, pCompass->devAddr);
 
     /* Configure CRB */
     temp = (compassCfg.gain_control << COMPASS_CRB_GN);
 
-    commandGenTx(COMPASS_CFGB, temp, pTxcmd);
+    commandGenTx(COMPASS_CR2, temp, pTxcmd);
 
-    I2C_MasterTx(pI2CHandle, pTxcmd, 3, pCompass->devAddr);
+    I2C_MasterTx(pI2CHandle, pTxcmd, 2, pCompass->devAddr);
 
     /* Configure Mode */
     temp = (compassCfg.op_mode << COMPASS_MODE_MDO) |
            (compassCfg.hsbit   << COMPASS_MODEHS);
 
-	commandGenTx(COMPASS_MODE, temp, pTxcmd);
+	commandGenTx(COMPASS_CR2, temp, pTxcmd);
 
-    I2C_MasterTx(pI2CHandle, pTxcmd, 3, pCompass->devAddr);
+    I2C_MasterTx(pI2CHandle, pTxcmd, 2, pCompass->devAddr);
 
 }
 
@@ -180,8 +180,7 @@ void commandGenRx (uint8_t address, uint8_t *Rxcmd) {
  */
 void commandGenTx (uint8_t address, uint8_t txDat, uint8_t *Txcmd) {
 
-	*(Txcmd + 0) = COMPASS_REG_WRITE;
-	*(Txcmd + 1) = address;
-	*(Txcmd + 2) = txDat;
+	*(Txcmd + 0) = address;
+	*(Txcmd + 1) = txDat;
 
 }
