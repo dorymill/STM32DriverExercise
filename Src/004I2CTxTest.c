@@ -39,17 +39,19 @@ int main(void)
     memset(&hi2c2, 0 , sizeof(hi2c2));
     hi2c2.pI2Cx = I2C2;
 
-    CompassHandle_t hcompass;
+//    CompassHandle_t hcompass;
 
     GPIO_ClockCtl(hgpiob.pGPIOx, ENABLE);
     I2C_ClockCtl(hi2c2.pI2Cx, ENABLE);
+
+    char *txBuffer = "Hello, Arduino Nano!";
 
 
     /* Base configuration */
     hgpiob.GPIO_PinConfig.GPIO_PinAltFunc = 4;
     hgpiob.GPIO_PinConfig.GPIO_PinMode    = GPIO_MODE_ALTFUNC;
     hgpiob.GPIO_PinConfig.GPIO_PinOPType  = GPIO_OUTPUT_OD;
-    hgpiob.GPIO_PinConfig.GPIO_PinPUPDCtl = GPIO_PUPD_NN; /* NN | External Pull-Up: 2.2 kΩ */
+    hgpiob.GPIO_PinConfig.GPIO_PinPUPDCtl = GPIO_PUPD_PU; /* NN | External Pull-Up: 2.2 kΩ */
     hgpiob.GPIO_PinConfig.GPIO_PinSpeed   = GPIO_SPEED_FA;
 
     /* SCLK */
@@ -63,19 +65,21 @@ int main(void)
     /* Init the I2C handle */
     hi2c2.I2C_Config.CLKSPD   = I2C_SCLK_SM;
     hi2c2.I2C_Config.FMDTYCYC = I2C_FMDTY_2;
-    hi2c2.I2C_Config.ADDR     = 0x61; /* Dummy addr */
+    hi2c2.I2C_Config.ADDR     = 0x68; /* Dummy addr */
 
     I2C_Init(&hi2c2);
 
     /* Set compass configuration structure. */
-    hcompass.compConfig.averaging    = COMPASS_MA_AVG1;
-    hcompass.compConfig.output_rate  = COMPASS_DSO_15Hz;
-    hcompass.compConfig.bias_control = COMPASS_MS_NORMAL;
-    hcompass.compConfig.gain_control = COMPASS_GAIN_P1P9G;
-    hcompass.compConfig.op_mode      = COMPASS_MODE_SNGL;
-    hcompass.compConfig.hsbit        = 0;
+//    hcompass.compConfig.averaging    = COMPASS_MA_AVG1;
+//    hcompass.compConfig.output_rate  = COMPASS_DSO_15Hz;
+//    hcompass.compConfig.bias_control = COMPASS_MS_NORMAL;
+//    hcompass.compConfig.gain_control = COMPASS_GAIN_P1P9G;
+//    hcompass.compConfig.op_mode      = COMPASS_MODE_SNGL;
+//    hcompass.compConfig.hsbit        = 0;
+//
+//    InitCompass(&hi2c2, &hcompass, hcompass.compConfig);
 
-    InitCompass(&hi2c2, &hcompass, hcompass.compConfig);
+    I2C_MasterTx(&hi2c2, (uint8_t *) txBuffer, strlen(txBuffer)+1, 0x68);
 
     return 0;
 }

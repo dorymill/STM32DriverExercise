@@ -131,7 +131,7 @@ uint32_t I2C_PLLClockValue(void)
     }
     else
     {
-        apbpr = APB_Prescaler[temp -4];
+        apbpr = APB_Prescaler[temp - 4];
     }
 
     /* Calculate final clock value to pass to I2C register */
@@ -248,7 +248,7 @@ void I2C_MasterTx (I2C_Handle_t *pI2CHandle,
 {
 
     /* Retry counter */
-    uint8_t retry = 0;
+    // uint8_t retry = 0;
 
     /* Generate START condition */
     I2C_GenerateStart(pI2CHandle->pI2Cx);
@@ -262,25 +262,7 @@ void I2C_MasterTx (I2C_Handle_t *pI2CHandle,
     /* Confirm SR1 address field */
     while(!I2C_GetFlagStatus(pI2CHandle->pI2Cx, I2C_FLAG_ADDR)) {
         
-        // if(retry > 5) {
-        //     pI2CHandle->pI2Cx->CR1 |= (1 << 0);
-        //     pI2CHandle->pI2Cx->CR1 |= (0 << 0);
-
-        //     return;
-        // }
-
-        // pI2CHandle->pI2Cx->CR1 |= (1 << 0);
-        // pI2CHandle->pI2Cx->CR1 |= (0 << 0);
-
-        // I2C_GenerateStart(pI2CHandle->pI2Cx);
-
-        // while(!I2C_GetFlagStatus(pI2CHandle->pI2Cx, I2C_FLAG_SB));
-
-        // I2C_ExecAddrPhase(pI2CHandle->pI2Cx, slaveAddr, TX);
-
-        // for(int iter = 0; iter < 2000; iter++);
-
-        // retry++;
+        // Add retry handling here otherwise we'll hang.
 
     }
 
