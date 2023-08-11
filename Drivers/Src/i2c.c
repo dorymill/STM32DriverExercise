@@ -277,6 +277,9 @@ void I2C_MasterTx (I2C_Handle_t *pI2CHandle,
         pI2CHandle->pI2Cx->DR = *pTxBuffer;
         pTxBuffer++;
         len--;
+
+        // Make sure that very last byte gets out.
+        while(!I2C_GetFlagStatus(pI2CHandle->pI2Cx, I2C_FLAG_TXE));
     }
 
     /* Generate STOP condition */

@@ -67,7 +67,7 @@ int main(void)
     I2C_Init(&hi2c2);
 
     /* Arduino device at address 0x68 */
-    I2C_MasterTx(&hi2c2, (uint8_t *) txBuffer, strlen(txBuffer)+1, 0x68);
+    I2C_MasterTx(&hi2c2, (uint8_t *) txBuffer, strlen(txBuffer), 0x68);
 
     return 0;
 }
