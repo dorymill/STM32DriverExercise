@@ -26,7 +26,8 @@ uint8_t  APB_Prescaler[4] = {2,4,8,16};
  * @brief Static function protoypes
  * 
  */
-static void     I2C_ACKControl   (I2C_RegDef_t *pI2Cx, uint8_t ACKNACK);
+static uint8_t  I2C_GetFlagStatus(I2C_RegDef_t *pI2Cx, uint32_t flag);
+
 static void     I2C_GenerateStart(I2C_RegDef_t *pI2Cx);
 static void     I2C_GenerateStop (I2C_RegDef_t *pI2Cx);
 static void     I2C_ClearAddrFlag(I2C_RegDef_t *pI2Cx);
@@ -311,17 +312,17 @@ void I2C_MasterRx (I2C_Handle_t *pI2CHandle,
         /* Disable ACK */
         I2C_ACKControl(pI2CHandle->pI2Cx, NACK);
 
-        /* Generate STOP */
-        I2C_GenerateStop(pI2CHandle->pI2Cx);
-
         /* Clear ADDR flag */
         I2C_ClearAddrFlag(pI2CHandle->pI2Cx);
 
         /* Wait for RXNE */
         while(!I2C_GetFlagStatus(pI2CHandle->pI2Cx, I2C_FLAG_RXNE));
+  
+        /* Generate STOP */
+        I2C_GenerateStop(pI2CHandle->pI2Cx);
 
         /* Read data */
-        pRxBuffer = (uint8_t *) pI2CHandle->pI2Cx->DR;
+        *((volatile uint8_t *)&pRxBuffer) = pI2CHandle->pI2Cx->DR;
 
     }
 
@@ -347,7 +348,7 @@ void I2C_MasterRx (I2C_Handle_t *pI2CHandle,
             }
 
             /* Read data */
-            pRxBuffer = (uint8_t *) pI2CHandle->pI2Cx->DR;
+            *((volatile uint8_t *)&pRxBuffer) = pI2CHandle->pI2Cx->DR;
             pRxBuffer++;
             len--;
 
@@ -355,14 +356,8 @@ void I2C_MasterRx (I2C_Handle_t *pI2CHandle,
     }
 
     /* Re-enable ACK */
-    if(pI2CHandle->I2C_Config.ACKCTL == ACK)
-    {
-        I2C_ACKControl(pI2CHandle->pI2Cx, ACK);
-    }
-    else
-    {
-        I2C_ACKControl(pI2CHandle->pI2Cx, NACK);
-    }
+    I2C_ACKControl(pI2CHandle->pI2Cx, ACK);
+
 }
 
  
@@ -377,6 +372,7 @@ void I2C_MasterRx (I2C_Handle_t *pI2CHandle,
  * 
  * @param pI2C I2C register pointer 
  */
+static
 void     I2C_GenerateStart(I2C_RegDef_t *pI2Cx)
 {
     /* Generate start condition */
@@ -389,6 +385,7 @@ void     I2C_GenerateStart(I2C_RegDef_t *pI2Cx)
  * 
  * @param pI2C I2C register pointer 
  */
+static
 void     I2C_GenerateStop(I2C_RegDef_t *pI2Cx)
 {
     /* Generate start condition */
@@ -403,6 +400,7 @@ void     I2C_GenerateStop(I2C_RegDef_t *pI2Cx)
  * @param flag Flag to check
  * @return uint8_t 
  */
+static
 uint8_t  I2C_GetFlagStatus(I2C_RegDef_t *pI2Cx, uint32_t flag)
 {
     if(pI2Cx->SR1 & flag)
@@ -420,6 +418,7 @@ uint8_t  I2C_GetFlagStatus(I2C_RegDef_t *pI2Cx, uint32_t flag)
  * @param slaveAddr Address of slave device
  * @param RxTx      Receive or transmit flag
  */
+static
 void     I2C_ExecAddrPhase(I2C_RegDef_t *pI2Cx, 
                                  uint8_t slaveAddr, 
                                  uint8_t RxTx)
@@ -444,6 +443,7 @@ void     I2C_ExecAddrPhase(I2C_RegDef_t *pI2Cx,
  * 
  * @param pI2C I2C register pointer 
  */
+static
 void     I2C_ClearAddrFlag(I2C_RegDef_t *pI2Cx)
 {
     uint32_t dummy = pI2Cx->SR1;

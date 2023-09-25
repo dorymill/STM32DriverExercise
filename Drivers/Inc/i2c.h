@@ -201,7 +201,7 @@ void I2C_IRQPriorityConfig (uint8_t IRQNumber, uint32_t IRQPriority);
 
 /* Helper functions */
 uint32_t I2C_PLLClockValue(void);
-uint8_t  I2C_GetFlagStatus(I2C_RegDef_t *pI2Cx, uint32_t flag);
+void I2C_ACKControl   (I2C_RegDef_t *pI2Cx, uint8_t ACKNACK);
 
 
 /* Application callback interface */
